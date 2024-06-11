@@ -14,4 +14,5 @@ type Command struct {
 	Client      *Client
 	CommandType int
 	Args        []string
+    CurrentRoomId string
 }

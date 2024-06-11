@@ -1,11 +1,11 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net"
 
+	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -20,35 +20,29 @@ func main() {
 		log.Fatalf("Failed to listen: %v", err)
 	}
 
-	ctx := context.Background()
 	redisClient := redis.NewClient(
 		&redis.Options{
-			Addr:     "localhost:6379",
-			Password: "1234",
-			DB:       0,
+			Addr: "localhost:6379",
+			DB:   0,
 		},
 	)
 
-	go func() {
-		redisClient.Subscribe(ctx, "chat-message")
-	}()
+	hostId := uuid.New().String()
+	server := NewServer(hostId, redisClient)
 
-	server := NewServer()
 	go server.Run()
 
 	for {
-
 		conn, err := listener.Accept()
 		if err != nil {
 			log.Printf("Failed to read connection from %s", conn.RemoteAddr().String())
 			continue
 		}
-
 		log.Printf("New client %s has join the server", conn.RemoteAddr().String())
 
 		client := NewClient(conn, server.ComChan)
-
-		go client.readInput()
+		server.AddClient(client)
+		go client.ReadInput()
 
 	}
 

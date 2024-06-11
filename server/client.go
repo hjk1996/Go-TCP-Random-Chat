@@ -5,22 +5,27 @@ import (
 	"log"
 	"net"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 type Client struct {
-	Conn    net.Conn
-	ComChan chan<- Command
+	ID            string
+	Conn          net.Conn
+	ComChan       chan<- Command
+	CurrentRoomId string
 }
 
 func NewClient(conn net.Conn, comChan chan<- Command) *Client {
+	clientId := uuid.New().String()
 	return &Client{
+		ID:      clientId,
 		Conn:    conn,
 		ComChan: comChan,
 	}
-
 }
 
-func (c *Client) readInput() {
+func (c *Client) ReadInput() {
 	for {
 		msg, err := bufio.NewReader(c.Conn).ReadString('\n')
 		if err != nil {
@@ -28,13 +33,10 @@ func (c *Client) readInput() {
 		}
 
 		args := strings.Split(msg, " ")
+		cmd := strings.TrimSpace(args[0])
 
-		if len(args) < 2 {
-			log.Printf("Invalid input")
-			continue
-		}
-
-		cmd := args[0]
+		log.Printf("CMD: %s\n", cmd)
+		log.Printf("ARGS: %v\n", args)
 
 		switch cmd {
 		case "/join":
@@ -62,6 +64,8 @@ func (c *Client) readInput() {
 				CommandType: CMD_SEND_MESSAGE,
 				Args:        args[1:],
 			}
+		default:
+			log.Printf("Wrong command: %s", cmd)
 		}
 
 	}

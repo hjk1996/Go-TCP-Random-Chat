@@ -3,6 +3,6 @@ package main
 import "net"
 
 type Room struct {
-	Name    string
+	ID string
 	Clients map[net.Addr]*Client
 }
