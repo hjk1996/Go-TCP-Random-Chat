@@ -12,13 +12,11 @@ import (
 func main() {
 
 	fmt.Println("Initializing the chat server...")
-
 	listener, err := net.Listen("tcp", "localhost:8888")
-	defer listener.Close()
-
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
+	defer listener.Close()
 
 	redisClient := redis.NewClient(
 		&redis.Options{
@@ -30,7 +28,7 @@ func main() {
 	hostId := uuid.New().String()
 	server := NewServer(hostId, redisClient)
 
-	go server.Run()
+	server.Run()
 
 	for {
 		conn, err := listener.Accept()
@@ -38,8 +36,7 @@ func main() {
 			log.Printf("Failed to read connection from %s", conn.RemoteAddr().String())
 			continue
 		}
-		log.Printf("New client %s has join the server", conn.RemoteAddr().String())
-
+		log.Printf("New client from %s has join the server", conn.RemoteAddr().String())
 		client := NewClient(conn, server.ComChan)
 		server.AddClient(client)
 		go client.ReadInput()
