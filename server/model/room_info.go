@@ -3,6 +3,7 @@ package model
 import (
 	"bytes"
 	"encoding/gob"
+	"encoding/json"
 )
 
 type RoomInfo struct {
@@ -26,4 +27,9 @@ func (r *RoomInfo) Copy() (*RoomInfo, error) {
 	}
 	return &result, nil
 
+}
+
+func (r *RoomInfo) ToJson() []byte {
+	val, _ := json.Marshal(r)
+	return val
 }

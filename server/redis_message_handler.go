@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-
 	"example.com/chat/model"
 )
 
@@ -42,6 +41,7 @@ func (rh *RedisMessageHandler) handleLeaveRoom(msg model.BroadcastMessage) {
 			continue
 		}
 		target.CurrentRoomId = ""
+
 		target.Conn.Write([]byte(msg.Content))
 	}
 }
@@ -57,4 +57,9 @@ func (rh *RedisMessageHandler) handleSendMessage(msg model.BroadcastMessage) {
 		}
 		target.Conn.Write([]byte(fmt.Sprintf("<%s>: %s\n", msg.SenderId, msg.Content)))
 	}
+}
+
+// TODO: 0613
+// 클라이언트에게 메시지 보내주는거 구현해야함
+func (rh *RedisMessageHandler) writeMessage(clientId string) {
 }
