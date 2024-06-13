@@ -37,7 +37,7 @@ func main() {
 			continue
 		}
 		log.Printf("New client from %s has join the server", conn.RemoteAddr().String())
-		client := NewClient(conn, server.ComChan)
+		client := NewClient(conn, server.ClientHandler.ComChan)
 		server.AddClient(client)
 		go client.ReadInput()
 

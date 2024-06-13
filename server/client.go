@@ -41,8 +41,8 @@ func (c *Client) ReadInput() {
 			log.Printf("Failed to read user input: %s", err.Error())
 		}
 
-		args := strings.Split(msg, " ")
-		cmd := strings.TrimSpace(args[0])
+		chunks := strings.Split(msg, " ")
+		cmd := strings.TrimSpace(chunks[0])
 
 		switch cmd {
 		case "/join":
@@ -62,13 +62,17 @@ func (c *Client) ReadInput() {
 				CommandType: CMD_NEW_ROOM,
 			}
 		case "/msg":
+			if len(chunks) < 2{
+				log.Printf("wrong message command.\n")
+				continue
+			}
 			c.ComChan <- Command{
 				Client:      c,
 				CommandType: CMD_SEND_MESSAGE,
-				Args:        args,
+				Args:        chunks[1:],
 			}
 		default:
-			log.Printf("Wrong command: %s", cmd)
+			log.Printf("Wrong command. : %s\n", cmd)
 		}
 
 	}
