@@ -21,15 +21,15 @@ func (ch *ClientHandler) HandleClientMessage() {
 	for cmd := range ch.ComChan {
 		switch cmd.CommandType {
 		case CMD_JOIN_ROOM:
-			ch.joinRoom(cmd)
+			go ch.joinRoom(cmd)
 		case CMD_LEAVE_ROOM:
-			ch.leaveRoom(cmd)
+			go ch.leaveRoom(cmd)
 		case CMD_NEW_ROOM:
-			ch.createRoom(cmd)
+			go ch.createRoom(cmd)
 		case CMD_SEND_MESSAGE:
-			ch.sendMessageToOthers(cmd)
+			go ch.sendMessageToOpponent(cmd)
 		case CMD_REMOVE_CLIENT:
-			ch.removeClient(cmd)
+			go ch.removeClient(cmd)
 		case CMD_GET_CURRENT_ROOM:
 
 		}
@@ -68,14 +68,13 @@ func (ch *ClientHandler) joinRoom(cmd Command) {
 		return
 	}
 
-	// 새로운 방정보 만들기
+	// 새로운 방정보 만들기고 레디스에 업데이트
 	newRoomInfo, err := roomInfo.Copy()
 	if err != nil {
 		content := fmt.Sprintf("Failed to join a room : %s", err.Error())
 		ch.writeLogAndSendError(cmd.Client.ID, content)
 		return
 	}
-
 	newRoomInfo.Clients = append(newRoomInfo.Clients, model.ClientInfo{
 		ID:     cmd.Client.ID,
 		HostID: ch.Server.HostId,
@@ -86,9 +85,6 @@ func (ch *ClientHandler) joinRoom(cmd Command) {
 		log.Printf("Failed to find the client %s\n", cmd.Client.ID)
 		return
 	}
-	c.CurrentRoomId = roomInfo.ID
-
-	//레디스에 새로운 방정보 업데이트
 	err = ch.Server.RedisClient.Set(
 		ch.Server.ctx,
 		fmt.Sprintf("room:%s",
@@ -101,6 +97,16 @@ func (ch *ClientHandler) joinRoom(cmd Command) {
 		ch.writeLogAndSendError(cmd.Client.ID, content)
 		return
 	}
+
+	// 메모리에서 클라이언트 현재 방 ID 업데이트
+	c.CurrentRoomId = roomInfo.ID
+
+	go ch.sendMessageToClient(
+		cmd.Client.ID,
+		model.CLIENT_JOIN_ROOM,
+		cmd.Client.ID,
+		"",
+	)
 
 	log.Printf("User %s has joined the room %s\n", cmd.Client.ID, roomInfo.ID)
 	// 기존에 방에 있던 클라이언트들에게 새로운 유저가 들어왔다고 알림
@@ -165,6 +171,13 @@ func (ch *ClientHandler) leaveRoom(cmd Command) {
 	}
 
 	log.Printf("User %s has left the room %s\n", cmd.Client.ID, roomInfo.ID)
+
+	go ch.sendMessageToClient(
+		cmd.Client.ID,
+		model.CLIENT_LEAVE_ROOM,
+		cmd.Client.ID,
+		"",
+	)
 
 	// TODO: 이후에 방에 있던 클라이언트의 방 ID도 초기해줘야함.
 	for hostId, clientIds := range hostMap {
@@ -241,16 +254,20 @@ func (ch *ClientHandler) createRoom(cmd Command) {
 		return
 	}
 
+	// 클라이언트 현재 방 업데이트
 	cmd.Client.CurrentRoomId = roomId
 
+	ch.sendMessageToClient(
+		cmd.Client.ID,
+		model.CLIENT_CREATE_ROOM,
+		cmd.Client.ID,
+		"",
+	)
 	log.Printf("Client opened the new room %s\n", roomId)
 
 }
 
-func (ch *ClientHandler) sendMessageToOthers(cmd Command) {
-	ch.Server.mutex.Lock()
-	defer ch.Server.mutex.Unlock()
-
+func (ch *ClientHandler) sendMessageToOpponent(cmd Command) {
 	if cmd.Client.CurrentRoomId == "" {
 		content := fmt.Sprintf("User %s does not belong to any room.", cmd.Client.ID)
 		ch.writeLogAndSendError(cmd.Client.ID, content)

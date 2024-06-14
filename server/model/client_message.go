@@ -11,7 +11,8 @@ const (
 	CLIENT_CREATE_ROOM = 0
 	CLIENT_JOIN_ROOM   = 1
 	CLIENT_LEAVE_ROOM  = 2
-	CLIENT_ERROR       = 3
+	CLIENT_SEND_MESSAGE = 3
+	CLIENT_ERROR       = 4
 )
 
 type ClientMessage struct {

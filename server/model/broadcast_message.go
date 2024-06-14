@@ -5,9 +5,9 @@ import "encoding/json"
 type BroadcastMessageType int
 
 const (
-	BROADCAST_JOIN_ROOM    = 1
-	BROADCAST_LEAVE_ROOM   = 2
-	BROADCAST_SEND_MESSAGE = 3
+	BROADCAST_JOIN_ROOM    = 0
+	BROADCAST_LEAVE_ROOM   = 1
+	BROADCAST_SEND_MESSAGE = 2
 )
 
 type BroadcastMessage struct {
