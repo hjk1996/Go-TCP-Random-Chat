@@ -21,22 +21,22 @@ func (ch *ClientHandler) HandleClientMessage() {
 	for cmd := range ch.ComChan {
 		switch cmd.CommandType {
 		case CMD_JOIN_ROOM:
-			go ch.joinRoom(cmd)
+			go ch.handleJoinRoom(cmd)
 		case CMD_LEAVE_ROOM:
-			go ch.leaveRoom(cmd)
+			go ch.handleLeaveRoom(cmd)
 		case CMD_NEW_ROOM:
-			go ch.createRoom(cmd)
+			go ch.handleCreateRoom(cmd)
 		case CMD_SEND_MESSAGE:
-			go ch.sendMessageToOpponent(cmd)
+			go ch.handleSendMessageToOpponent(cmd)
 		case CMD_REMOVE_CLIENT:
-			go ch.removeClient(cmd)
+			go ch.handleRemoveClient(cmd)
 		case CMD_GET_CURRENT_ROOM:
 
 		}
 	}
 }
 
-func (ch *ClientHandler) joinRoom(cmd Command) {
+func (ch *ClientHandler) handleJoinRoom(cmd Command) {
 	ch.Server.mutex.Lock()
 	defer ch.Server.mutex.Unlock()
 
@@ -47,9 +47,11 @@ func (ch *ClientHandler) joinRoom(cmd Command) {
 	}
 
 	val, err := ch.Server.RedisClient.LPop(ch.Server.ctx, "open_rooms").Result()
+
+	// 방이 없으면 새로운 방을 만드는 goroutine을 생성
 	if err == redis.Nil {
 		log.Println("No room exists. create new one")
-		go ch.createRoom(cmd)
+		go ch.handleCreateRoom(cmd)
 		return
 	}
 
@@ -61,49 +63,45 @@ func (ch *ClientHandler) joinRoom(cmd Command) {
 		return
 	}
 
-	// 모종의 이유로 들어간 방에 나혼자 밖에 없을 때.
+	// 모종의 이유로 들어간 방에 아무도 없을 때.
 	// 그냥 방을 다시 만듬
 	if len(roomInfo.Clients) == 0 {
-		go ch.createRoom(cmd)
+		go ch.handleCreateRoom(cmd)
 		return
 	}
 
-	// 새로운 방정보 만들기고 레디스에 업데이트
-	newRoomInfo, err := roomInfo.Copy()
-	if err != nil {
-		content := fmt.Sprintf("Failed to join a room : %s", err.Error())
-		ch.writeLogAndSendError(cmd.Client.ID, content)
-		return
+	// 내가 만든 방에 내가 들어갔을 때 방을 다시 만듬
+	for _, client := range roomInfo.Clients {
+		if cmd.Client.ID == client.ID {
+			go ch.handleCreateRoom(cmd)
+			return
+		}
 	}
+
+	// 새로운 방정보 만들기고 레디스에 업데이트
+	newRoomInfo := roomInfo.Copy()
 	newRoomInfo.Clients = append(newRoomInfo.Clients, model.ClientInfo{
 		ID:     cmd.Client.ID,
 		HostID: ch.Server.HostId,
 	})
-
 	c := ch.Server.Clients[cmd.Client.ID]
 	if c == nil {
 		log.Printf("Failed to find the client %s\n", cmd.Client.ID)
 		return
 	}
-	err = ch.Server.RedisClient.Set(
-		ch.Server.ctx,
-		fmt.Sprintf("room:%s",
-			roomInfo.ID),
-		newRoomInfo.ToJson(),
-		0).Err()
 
-	if err != nil {
-		content := fmt.Sprintf("Failed to join a room : %s", err.Error())
-		ch.writeLogAndSendError(cmd.Client.ID, content)
+	if err := ch.setRoomInRedis(newRoomInfo); err != nil {
+		ch.writeLogAndSendError(cmd.Client.ID, err.Error())
 		return
+
 	}
 
 	// 메모리에서 클라이언트 현재 방 ID 업데이트
 	c.CurrentRoomId = roomInfo.ID
 
-	go ch.sendMessageToClient(
+	ch.sendMessageToClient(
 		cmd.Client.ID,
-		model.CLIENT_JOIN_ROOM,
+		model.CLIENT_JOIN_ROOM_CONFIRM,
 		cmd.Client.ID,
 		"",
 	)
@@ -113,7 +111,7 @@ func (ch *ClientHandler) joinRoom(cmd Command) {
 	for _, client := range roomInfo.Clients {
 		go ch.broadcastMessage(
 			client.HostID,
-			model.BROADCAST_JOIN_ROOM,
+			model.BROADCAST_OPPONENT_JOIN_ROOM,
 			cmd.Client.ID,
 			[]string{client.ID},
 			"",
@@ -122,68 +120,64 @@ func (ch *ClientHandler) joinRoom(cmd Command) {
 
 }
 
-func (ch *ClientHandler) leaveRoom(cmd Command) {
+func (ch *ClientHandler) handleLeaveRoom(cmd Command) {
 	ch.Server.mutex.Lock()
 	defer ch.Server.mutex.Unlock()
 
-	// 나갈 방이 없을 때
-	if cmd.Client.CurrentRoomId == "" {
-		content := fmt.Sprintf("Client %s does not belng to any room", cmd.Client.ID)
-		ch.writeLogAndSendError(cmd.Client.ID, content)
+	// 클라이언트가 아무 방에 속해있지 않을 때
+	if !ch.checkClientHasRoom(cmd) {
+		ch.writeLogAndSendError(cmd.Client.ID, "Client does not belong to any room")
 		return
 	}
 
 	// 레디스에서 현재 유저 방의 정보를 받아옴.
 	roomInfo, err := ch.getRoomInfo(cmd.Client.CurrentRoomId)
 	if err != nil {
-		content := fmt.Sprintf("Failed to get room info : %s", err.Error())
-		ch.writeLogAndSendError(cmd.Client.ID, content)
+		cmd.Client.CurrentRoomId = ""
+		ch.writeLogAndSendError(cmd.Client.ID, fmt.Sprintf("Failed to get room info : %s", err.Error()))
 		return
-	}
-
-	// 유저 혼자있는 방일 때 그냥 방을 삭제해버리고 함수 종료
-	if len(roomInfo.Clients) < 2 {
-		err := ch.Server.RedisClient.Del(ch.Server.ctx, fmt.Sprintf("room:%s", cmd.Client.CurrentRoomId)).Err()
-		if err != nil {
-			content := fmt.Sprintf("Failed to delete the room %s : %s\n", cmd.Client.CurrentRoomId, err.Error())
-			ch.writeLogAndSendError(cmd.Client.ID, content)
-		}
-		return
-	}
-
-	// 유저가 나갔다는 메시지 전달할 대상 탐색
-	hostMap := make(map[string][]string)
-	for _, client := range roomInfo.Clients {
-		// 나간 당사자면 메세지 전달 목록에 포함 안함
-		if client.ID == cmd.Client.ID {
-			continue
-		}
-		hostMap[client.HostID] = append(hostMap[client.HostID], client.ID)
 	}
 
 	// 클라이언트 방 초기화
 	cmd.Client.CurrentRoomId = ""
-	// 방 삭제
-	err = ch.Server.RedisClient.Del(ch.Server.ctx, fmt.Sprintf("room:%s", cmd.Client.CurrentRoomId)).Err()
-	if err != nil {
+
+	// 유저 혼자있는 방일 때 그냥 방을 삭제해버리고 함수 종료
+	if len(roomInfo.Clients) < 2 {
+		ch.sendMessageToClient(
+			cmd.Client.ID,
+			model.CLIENT_LEAVE_ROOM_CONFIRM,
+			cmd.Client.ID,
+			"",
+		)
+		if err := ch.deleteRoomFromRedis(roomInfo.ID); err != nil {
+			ch.writeLogAndSendError(cmd.Client.ID, fmt.Sprintf("Failed to delete the room %s : %s", cmd.Client.CurrentRoomId, err.Error()))
+		}
+		log.Printf("User %s has left the room %s\n", cmd.Client.ID, roomInfo.ID)
+
+		return
+	}
+
+	// 클라이언트에게 방을 나갔다고 메시지 보냄
+	ch.sendMessageToClient(
+		cmd.Client.ID,
+		model.CLIENT_LEAVE_ROOM_CONFIRM,
+		cmd.Client.ID,
+		"",
+	)
+	// 레디스 메모리에서 방 정보 삭제
+	if err := ch.deleteRoomFromRedis(roomInfo.ID); err != nil {
 		content := fmt.Sprintf("Failed to delete the room : %s", err.Error())
 		ch.writeLogAndSendError(cmd.Client.ID, content)
 	}
 
 	log.Printf("User %s has left the room %s\n", cmd.Client.ID, roomInfo.ID)
 
-	go ch.sendMessageToClient(
-		cmd.Client.ID,
-		model.CLIENT_LEAVE_ROOM,
-		cmd.Client.ID,
-		"",
-	)
-
-	// TODO: 이후에 방에 있던 클라이언트의 방 ID도 초기해줘야함.
+	// 유저가 나갔다는 메시지 전달할 대상 탐색
+	hostMap := ch.findBroadcastTargets(cmd, roomInfo)
+	// 방 안의 다른 클라이언트에게 유저가 나갔다는 메시지 전송
 	for hostId, clientIds := range hostMap {
-		// 메세지 브로드캐스팅
 		go ch.broadcastMessage(hostId,
-			model.BROADCAST_LEAVE_ROOM,
+			model.BROADCAST_OPPONENT_LEAVE_ROOM,
 			cmd.Client.ID,
 			clientIds,
 			fmt.Sprintf("User %s has left the room.\n", cmd.Client.ID),
@@ -192,32 +186,21 @@ func (ch *ClientHandler) leaveRoom(cmd Command) {
 
 }
 
-func (ch *ClientHandler) createRoom(cmd Command) {
+func (ch *ClientHandler) handleCreateRoom(cmd Command) {
 	ch.Server.mutex.Lock()
 	defer ch.Server.mutex.Unlock()
 
-	if cmd.Client.CurrentRoomId != "" {
-		content := fmt.Sprintf("Client has already joined the room %s", cmd.Client.CurrentRoomId)
-		ch.writeLogAndSendError(cmd.Client.ID, content)
+	// 유저가 방이 있는지 확인.
+	if ch.checkClientHasRoom(cmd) {
+		ch.writeLogAndSendError(cmd.Client.ID, "Client is already in a room")
 		return
 	}
 
-	// 고유햔 id 찾기
-	var roomId string
-	for {
-		roomId = uuid.New().String()
-		// 방정보 조회
-		_, err := ch.getRoomInfo(roomId)
-		if err == redis.Nil {
-			break
-		} else if err != nil {
-			content := fmt.Sprintf("Failed to create the room : %s", err.Error())
-			ch.writeLogAndSendError(cmd.Client.ID, content)
-			return
-		} else {
-			continue
-		}
-
+	// 없는 고유햔 id 찾기
+	roomId, err := ch.getNewRoomId(cmd)
+	if err != nil {
+		ch.writeLogAndSendError(cmd.Client.ID, err.Error())
+		return
 	}
 
 	clients := make([]model.ClientInfo, 0, 1)
@@ -226,28 +209,18 @@ func (ch *ClientHandler) createRoom(cmd Command) {
 		HostID: ch.Server.HostId,
 	}
 	clients = append(clients, clientInfo)
-	roomInfo := model.RoomInfo{
+	roomInfo := &model.RoomInfo{
 		ID:      roomId,
 		Clients: clients,
 	}
-	jsonData, err := json.Marshal(roomInfo)
 
-	if err != nil {
-		content := fmt.Sprintf("Failed to create the room: %s", err.Error())
-		ch.writeLogAndSendError(cmd.Client.ID, content)
-		return
-	}
-
-	// 룸 정보 레디스에 삽입
-	err = ch.Server.RedisClient.Set(ch.Server.ctx, fmt.Sprintf("room:%s", roomId), jsonData, 0).Err()
-	if err != nil {
-		content := fmt.Sprintf("Failed to set the room information: %s", err.Error())
-		ch.writeLogAndSendError(cmd.Client.ID, content)
+	if err := ch.setRoomInRedis(roomInfo); err != nil {
+		ch.writeLogAndSendError(cmd.Client.ID, fmt.Sprintf("failed to create the room : %s", err.Error()))
 		return
 	}
 
 	// 열려있는 방목록에 룸 정보 삽입
-	err = ch.Server.RedisClient.RPush(ch.Server.ctx, "open_rooms", jsonData).Err()
+	err = ch.Server.RedisClient.RPush(ch.Server.ctx, "open_rooms", roomInfo.ToJson()).Err()
 	if err != nil {
 		content := fmt.Sprintf("Failed to create the room: %s", err.Error())
 		ch.writeLogAndSendError(cmd.Client.ID, content)
@@ -259,7 +232,7 @@ func (ch *ClientHandler) createRoom(cmd Command) {
 
 	ch.sendMessageToClient(
 		cmd.Client.ID,
-		model.CLIENT_CREATE_ROOM,
+		model.CLIENT_CREATE_ROOM_CONFIRM,
 		cmd.Client.ID,
 		"",
 	)
@@ -267,28 +240,18 @@ func (ch *ClientHandler) createRoom(cmd Command) {
 
 }
 
-func (ch *ClientHandler) sendMessageToOpponent(cmd Command) {
-	if cmd.Client.CurrentRoomId == "" {
-		content := fmt.Sprintf("User %s does not belong to any room.", cmd.Client.ID)
-		ch.writeLogAndSendError(cmd.Client.ID, content)
+func (ch *ClientHandler) handleSendMessageToOpponent(cmd Command) {
+
+	if !ch.checkClientHasRoom(cmd) {
+		ch.writeLogAndSendError(cmd.Client.ID, fmt.Sprintf("User %s does not belong to any room.", cmd.Client.ID))
 		return
 	}
 
-	var roomInfo model.RoomInfo
-
-	data, err := ch.Server.RedisClient.Get(ch.Server.ctx, fmt.Sprintf("room:%s", cmd.Client.CurrentRoomId)).Result()
+	roomInfo, err := ch.getRoomInfo(cmd.Client.CurrentRoomId)
 
 	if err != nil {
-		content := fmt.Sprintf("Failed to get the data from the redis. : %s", err.Error())
-		ch.writeLogAndSendError(cmd.Client.ID, content)
+		ch.writeLogAndSendError(cmd.Client.ID, fmt.Sprintf("Failed to get the data from the redis. : %s", err.Error()))
 		return
-	}
-
-	err = json.Unmarshal([]byte(data), &roomInfo)
-
-	if err != nil {
-		content := fmt.Sprintf("Failed to parse the json string. : %s", err.Error())
-		ch.writeLogAndSendError(cmd.Client.ID, content)
 	}
 
 	if len(roomInfo.Clients) == 1 {
@@ -302,7 +265,7 @@ func (ch *ClientHandler) sendMessageToOpponent(cmd Command) {
 
 		msg := strings.Join(cmd.Args, " ") + "\n"
 		ch.broadcastMessage(c.HostID,
-			model.BROADCAST_SEND_MESSAGE,
+			model.BROADCAST_OPPONENT_SEND_MESSAGE,
 			cmd.Client.ID,
 			[]string{c.ID},
 			msg,
@@ -311,6 +274,34 @@ func (ch *ClientHandler) sendMessageToOpponent(cmd Command) {
 	}
 
 }
+
+func (ch *ClientHandler) handleRemoveClient(cmd Command) {
+	ch.Server.mutex.Lock()
+	defer ch.Server.mutex.Unlock()
+
+	if !ch.checkClientHasRoom(cmd) {
+		delete(ch.Server.Clients, cmd.Client.ID)
+		log.Printf("Removed client %s", cmd.Client.ID)
+		return
+	}
+
+	roomInfo, err := ch.getRoomInfo(cmd.Client.CurrentRoomId)
+
+	if err == nil {
+		for _, client := range roomInfo.Clients {
+			go ch.broadcastMessage(client.HostID, model.BROADCAST_OPPONENT_LEAVE_ROOM, cmd.Client.ID, []string{client.ID}, fmt.Sprintf("User %s has left the room.\n", cmd.Client.ID))
+		}
+	} else {
+		log.Printf("Failed to get room info %s", roomInfo.ID)
+	}
+
+	err = ch.Server.RedisClient.Del(ch.Server.ctx, fmt.Sprintf("room:%s", cmd.Client.CurrentRoomId)).Err()
+	if err != nil {
+		log.Printf("Failed to delete the room that the client left. :%s\n", err.Error())
+	}
+	delete(ch.Server.Clients, cmd.Client.ID)
+}
+
 func (ch *ClientHandler) broadcastMessage(
 	channel string, messageType model.BroadcastMessageType, senderId string, targets []string, content string) {
 
@@ -327,24 +318,6 @@ func (ch *ClientHandler) broadcastMessage(
 		log.Printf("Failed to send message to channel %s\n", channel)
 		return
 	}
-
-}
-
-func (ch *ClientHandler) removeClient(cmd Command) {
-	ch.Server.mutex.Lock()
-	defer ch.Server.mutex.Unlock()
-
-	if cmd.Client.CurrentRoomId == "" {
-		delete(ch.Server.Clients, cmd.Client.ID)
-		log.Printf("Removed client %s", cmd.Client.ID)
-		return
-	}
-
-	err := ch.Server.RedisClient.Del(ch.Server.ctx, fmt.Sprintf("room:%s", cmd.Client.CurrentRoomId)).Err()
-	if err != nil {
-		log.Printf("Failed to delete the room that the client left. :%s\n", err.Error())
-	}
-	delete(ch.Server.Clients, cmd.Client.ID)
 
 }
 
@@ -377,6 +350,62 @@ func (ch *ClientHandler) sendMessageToClient(target string, messageType model.Cl
 	} else {
 		client.Conn.Write(msg.ToJson())
 	}
+}
+
+func (ch *ClientHandler) checkClientHasRoom(cmd Command) bool {
+	if cmd.Client.CurrentRoomId == "" {
+		return false
+	} else {
+		return true
+
+	}
+}
+
+func (ch *ClientHandler) deleteRoomFromRedis(roomId string) error {
+	err := ch.Server.RedisClient.Del(ch.Server.ctx, fmt.Sprintf("room:%s", roomId)).Err()
+	if err != nil {
+		return fmt.Errorf("failed to delete the room: %s", err.Error())
+	}
+	return nil
+}
+
+func (ch *ClientHandler) setRoomInRedis(roomInfo *model.RoomInfo) error {
+	err := ch.Server.RedisClient.Set(ch.Server.ctx, fmt.Sprintf("room:%s", roomInfo.ID), roomInfo.ToJson(), time.Minute*30).Err()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ch *ClientHandler) findBroadcastTargets(cmd Command, roomInfo *model.RoomInfo) map[string][]string {
+	hostMap := make(map[string][]string)
+	for _, client := range roomInfo.Clients {
+		// 나간 당사자면 메세지 전달 목록에 포함 안함
+		if client.ID == cmd.Client.ID {
+			continue
+		}
+		hostMap[client.HostID] = append(hostMap[client.HostID], client.ID)
+	}
+	return hostMap
+
+}
+
+func (ch *ClientHandler) getNewRoomId(cmd Command) (string, error) {
+	var roomId string
+	for {
+		roomId = uuid.New().String()
+		// 방정보 조회
+		_, err := ch.getRoomInfo(roomId)
+		if err == redis.Nil {
+			break
+		} else if err != nil {
+			return "", fmt.Errorf("failed to create the room : %s", err.Error())
+		} else {
+			continue
+		}
+
+	}
+	return roomId, nil
 }
 
 func (ch *ClientHandler) writeLogAndSendError(target string, content string) {

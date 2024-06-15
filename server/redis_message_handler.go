@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"example.com/chat/model"
@@ -22,20 +23,20 @@ func (rh *RedisMessageHandler) HandleRedisMessage() {
 		var msg model.BroadcastMessage
 		json.Unmarshal([]byte(rawMessage.Payload), &msg)
 		switch msg.MessageType {
-		case model.BROADCAST_JOIN_ROOM:
-			go rh.handleJoinRoom(msg)
-		case model.BROADCAST_LEAVE_ROOM:
+		case model.BROADCAST_OPPONENT_JOIN_ROOM:
+			go rh.handleOpponentJoinRoom(msg)
+		case model.BROADCAST_OPPONENT_LEAVE_ROOM:
 			go rh.handleLeaveRoom(msg)
-		case model.BROADCAST_SEND_MESSAGE:
+		case model.BROADCAST_OPPONENT_SEND_MESSAGE:
 			go rh.handleSendMessage(msg)
 		}
 
 	}
 }
 
-func (rh *RedisMessageHandler) handleJoinRoom(msg model.BroadcastMessage) {
+func (rh *RedisMessageHandler) handleOpponentJoinRoom(msg model.BroadcastMessage) {
 	for _, targetID := range msg.Targets {
-		rh.writeMessage(targetID, msg, model.CLIENT_JOIN_ROOM)
+		rh.writeMessage(targetID, msg, model.CLIENT_OPPONENT_JOIN_ROOM)
 
 	}
 
@@ -48,15 +49,18 @@ func (rh *RedisMessageHandler) handleLeaveRoom(msg model.BroadcastMessage) {
 
 	for _, targetID := range msg.Targets {
 		target := rh.Server.Clients[targetID]
+		if target == nil {
+			continue
+		}
 		target.CurrentRoomId = ""
-		rh.writeMessage(targetID, msg, model.CLIENT_LEAVE_ROOM)
+		rh.writeMessage(targetID, msg, model.CLIENT_OPPONENT_LEAVE_ROOM)
 
 	}
 }
 
 func (rh *RedisMessageHandler) handleSendMessage(msg model.BroadcastMessage) {
 	for _, targetID := range msg.Targets {
-		rh.writeMessage(targetID, msg, model.CLIENT_SEND_MESSAGE)
+		rh.writeMessage(targetID, msg, model.CLIENT_OPPONENT_SEND_MESSAGE)
 	}
 }
 
@@ -68,10 +72,12 @@ func (rh *RedisMessageHandler) writeMessage(clientId string, msg model.Broadcast
 		log.Printf("User %s  does not exist on server", clientId)
 		return
 	}
+
+	content := strings.TrimSpace(msg.Content)
 	newMsg := &model.ClientMessage{
 		MessageType: messageType,
 		SenderID:    msg.SenderId,
-		Content:     msg.Content,
+		Content:     content,
 		Timestamp:   time.Now(),
 	}
 	target.Conn.Write([]byte(newMsg.ToJson()))

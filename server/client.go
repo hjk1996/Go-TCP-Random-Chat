@@ -32,6 +32,7 @@ func (c *Client) ReadInput() {
 		if err != nil {
 			if err == io.EOF {
 				log.Printf("Connection closed by client %s", c.ID)
+
 				c.ComChan <- Command{
 					Client:      c,
 					CommandType: CMD_REMOVE_CLIENT,

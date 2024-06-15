@@ -21,7 +21,8 @@ SocketMessage _$SocketMessageFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$SocketMessage {
   @JsonKey(name: "message_type")
-  int get messageType => throw _privateConstructorUsedError;
+  @SocketMessageTypeConverter()
+  SocketMessageType get messageType => throw _privateConstructorUsedError;
   @JsonKey(name: "sender_id")
   String get senderId => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
@@ -41,7 +42,9 @@ abstract class $SocketMessageCopyWith<$Res> {
       _$SocketMessageCopyWithImpl<$Res, SocketMessage>;
   @useResult
   $Res call(
-      {@JsonKey(name: "message_type") int messageType,
+      {@JsonKey(name: "message_type")
+      @SocketMessageTypeConverter()
+      SocketMessageType messageType,
       @JsonKey(name: "sender_id") String senderId,
       String content,
       @CustomDateTimeConverter() DateTime timestamp});
@@ -69,7 +72,7 @@ class _$SocketMessageCopyWithImpl<$Res, $Val extends SocketMessage>
       messageType: null == messageType
           ? _value.messageType
           : messageType // ignore: cast_nullable_to_non_nullable
-              as int,
+              as SocketMessageType,
       senderId: null == senderId
           ? _value.senderId
           : senderId // ignore: cast_nullable_to_non_nullable
@@ -95,7 +98,9 @@ abstract class _$$SocketMessageImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@JsonKey(name: "message_type") int messageType,
+      {@JsonKey(name: "message_type")
+      @SocketMessageTypeConverter()
+      SocketMessageType messageType,
       @JsonKey(name: "sender_id") String senderId,
       String content,
       @CustomDateTimeConverter() DateTime timestamp});
@@ -121,7 +126,7 @@ class __$$SocketMessageImplCopyWithImpl<$Res>
       messageType: null == messageType
           ? _value.messageType
           : messageType // ignore: cast_nullable_to_non_nullable
-              as int,
+              as SocketMessageType,
       senderId: null == senderId
           ? _value.senderId
           : senderId // ignore: cast_nullable_to_non_nullable
@@ -142,7 +147,9 @@ class __$$SocketMessageImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$SocketMessageImpl implements _SocketMessage {
   _$SocketMessageImpl(
-      {@JsonKey(name: "message_type") required this.messageType,
+      {@JsonKey(name: "message_type")
+      @SocketMessageTypeConverter()
+      required this.messageType,
       @JsonKey(name: "sender_id") required this.senderId,
       required this.content,
       @CustomDateTimeConverter() required this.timestamp});
@@ -152,7 +159,8 @@ class _$SocketMessageImpl implements _SocketMessage {
 
   @override
   @JsonKey(name: "message_type")
-  final int messageType;
+  @SocketMessageTypeConverter()
+  final SocketMessageType messageType;
   @override
   @JsonKey(name: "sender_id")
   final String senderId;
@@ -202,7 +210,9 @@ class _$SocketMessageImpl implements _SocketMessage {
 
 abstract class _SocketMessage implements SocketMessage {
   factory _SocketMessage(
-          {@JsonKey(name: "message_type") required final int messageType,
+          {@JsonKey(name: "message_type")
+          @SocketMessageTypeConverter()
+          required final SocketMessageType messageType,
           @JsonKey(name: "sender_id") required final String senderId,
           required final String content,
           @CustomDateTimeConverter() required final DateTime timestamp}) =
@@ -213,7 +223,8 @@ abstract class _SocketMessage implements SocketMessage {
 
   @override
   @JsonKey(name: "message_type")
-  int get messageType;
+  @SocketMessageTypeConverter()
+  SocketMessageType get messageType;
   @override
   @JsonKey(name: "sender_id")
   String get senderId;

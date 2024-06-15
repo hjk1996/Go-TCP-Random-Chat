@@ -18,44 +18,75 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$ChatViewEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() joinRoom,
-    required TResult Function() leaveRoom,
+    required TResult Function() joinRoomConfirm,
+    required TResult Function() opponentJoinRoom,
+    required TResult Function() leaveRoomConfirm,
+    required TResult Function() opponentLeaveRoom,
+    required TResult Function() opponentSendMessage,
+    required TResult Function() sendMessage,
     required TResult Function(Exception e) error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? joinRoom,
-    TResult? Function()? leaveRoom,
+    TResult? Function()? joinRoomConfirm,
+    TResult? Function()? opponentJoinRoom,
+    TResult? Function()? leaveRoomConfirm,
+    TResult? Function()? opponentLeaveRoom,
+    TResult? Function()? opponentSendMessage,
+    TResult? Function()? sendMessage,
     TResult? Function(Exception e)? error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? joinRoom,
-    TResult Function()? leaveRoom,
+    TResult Function()? joinRoomConfirm,
+    TResult Function()? opponentJoinRoom,
+    TResult Function()? leaveRoomConfirm,
+    TResult Function()? opponentLeaveRoom,
+    TResult Function()? opponentSendMessage,
+    TResult Function()? sendMessage,
     TResult Function(Exception e)? error,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(ChatViewEventJoinRoom value) joinRoom,
-    required TResult Function(ChatViewEventLeaveRoom value) leaveRoom,
+    required TResult Function(ChatViewEventJoinRoomConfirm value)
+        joinRoomConfirm,
+    required TResult Function(ChatViewEventOpponentJoinRoom value)
+        opponentJoinRoom,
+    required TResult Function(ChatViewEventLeaveRoomConfirm value)
+        leaveRoomConfirm,
+    required TResult Function(ChatViewEventOpponetLeaveRoom value)
+        opponentLeaveRoom,
+    required TResult Function(ChatViewEventOpponentSendMessage value)
+        opponentSendMessage,
+    required TResult Function(ChatViewEventSendMessage value) sendMessage,
     required TResult Function(ChatViewEventError value) error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ChatViewEventJoinRoom value)? joinRoom,
-    TResult? Function(ChatViewEventLeaveRoom value)? leaveRoom,
+    TResult? Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult? Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult? Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult? Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult? Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult? Function(ChatViewEventSendMessage value)? sendMessage,
     TResult? Function(ChatViewEventError value)? error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(ChatViewEventJoinRoom value)? joinRoom,
-    TResult Function(ChatViewEventLeaveRoom value)? leaveRoom,
+    TResult Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult Function(ChatViewEventSendMessage value)? sendMessage,
     TResult Function(ChatViewEventError value)? error,
     required TResult orElse(),
   }) =>
@@ -81,37 +112,40 @@ class _$ChatViewEventCopyWithImpl<$Res, $Val extends ChatViewEvent>
 }
 
 /// @nodoc
-abstract class _$$ChatViewEventJoinRoomImplCopyWith<$Res> {
-  factory _$$ChatViewEventJoinRoomImplCopyWith(
-          _$ChatViewEventJoinRoomImpl value,
-          $Res Function(_$ChatViewEventJoinRoomImpl) then) =
-      __$$ChatViewEventJoinRoomImplCopyWithImpl<$Res>;
+abstract class _$$ChatViewEventJoinRoomConfirmImplCopyWith<$Res> {
+  factory _$$ChatViewEventJoinRoomConfirmImplCopyWith(
+          _$ChatViewEventJoinRoomConfirmImpl value,
+          $Res Function(_$ChatViewEventJoinRoomConfirmImpl) then) =
+      __$$ChatViewEventJoinRoomConfirmImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$ChatViewEventJoinRoomImplCopyWithImpl<$Res>
-    extends _$ChatViewEventCopyWithImpl<$Res, _$ChatViewEventJoinRoomImpl>
-    implements _$$ChatViewEventJoinRoomImplCopyWith<$Res> {
-  __$$ChatViewEventJoinRoomImplCopyWithImpl(_$ChatViewEventJoinRoomImpl _value,
-      $Res Function(_$ChatViewEventJoinRoomImpl) _then)
+class __$$ChatViewEventJoinRoomConfirmImplCopyWithImpl<$Res>
+    extends _$ChatViewEventCopyWithImpl<$Res,
+        _$ChatViewEventJoinRoomConfirmImpl>
+    implements _$$ChatViewEventJoinRoomConfirmImplCopyWith<$Res> {
+  __$$ChatViewEventJoinRoomConfirmImplCopyWithImpl(
+      _$ChatViewEventJoinRoomConfirmImpl _value,
+      $Res Function(_$ChatViewEventJoinRoomConfirmImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$ChatViewEventJoinRoomImpl implements ChatViewEventJoinRoom {
-  const _$ChatViewEventJoinRoomImpl();
+class _$ChatViewEventJoinRoomConfirmImpl
+    implements ChatViewEventJoinRoomConfirm {
+  const _$ChatViewEventJoinRoomConfirmImpl();
 
   @override
   String toString() {
-    return 'ChatViewEvent.joinRoom()';
+    return 'ChatViewEvent.joinRoomConfirm()';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ChatViewEventJoinRoomImpl);
+            other is _$ChatViewEventJoinRoomConfirmImpl);
   }
 
   @override
@@ -120,33 +154,45 @@ class _$ChatViewEventJoinRoomImpl implements ChatViewEventJoinRoom {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() joinRoom,
-    required TResult Function() leaveRoom,
+    required TResult Function() joinRoomConfirm,
+    required TResult Function() opponentJoinRoom,
+    required TResult Function() leaveRoomConfirm,
+    required TResult Function() opponentLeaveRoom,
+    required TResult Function() opponentSendMessage,
+    required TResult Function() sendMessage,
     required TResult Function(Exception e) error,
   }) {
-    return joinRoom();
+    return joinRoomConfirm();
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? joinRoom,
-    TResult? Function()? leaveRoom,
+    TResult? Function()? joinRoomConfirm,
+    TResult? Function()? opponentJoinRoom,
+    TResult? Function()? leaveRoomConfirm,
+    TResult? Function()? opponentLeaveRoom,
+    TResult? Function()? opponentSendMessage,
+    TResult? Function()? sendMessage,
     TResult? Function(Exception e)? error,
   }) {
-    return joinRoom?.call();
+    return joinRoomConfirm?.call();
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? joinRoom,
-    TResult Function()? leaveRoom,
+    TResult Function()? joinRoomConfirm,
+    TResult Function()? opponentJoinRoom,
+    TResult Function()? leaveRoomConfirm,
+    TResult Function()? opponentLeaveRoom,
+    TResult Function()? opponentSendMessage,
+    TResult Function()? sendMessage,
     TResult Function(Exception e)? error,
     required TResult orElse(),
   }) {
-    if (joinRoom != null) {
-      return joinRoom();
+    if (joinRoomConfirm != null) {
+      return joinRoomConfirm();
     }
     return orElse();
   }
@@ -154,75 +200,97 @@ class _$ChatViewEventJoinRoomImpl implements ChatViewEventJoinRoom {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(ChatViewEventJoinRoom value) joinRoom,
-    required TResult Function(ChatViewEventLeaveRoom value) leaveRoom,
+    required TResult Function(ChatViewEventJoinRoomConfirm value)
+        joinRoomConfirm,
+    required TResult Function(ChatViewEventOpponentJoinRoom value)
+        opponentJoinRoom,
+    required TResult Function(ChatViewEventLeaveRoomConfirm value)
+        leaveRoomConfirm,
+    required TResult Function(ChatViewEventOpponetLeaveRoom value)
+        opponentLeaveRoom,
+    required TResult Function(ChatViewEventOpponentSendMessage value)
+        opponentSendMessage,
+    required TResult Function(ChatViewEventSendMessage value) sendMessage,
     required TResult Function(ChatViewEventError value) error,
   }) {
-    return joinRoom(this);
+    return joinRoomConfirm(this);
   }
 
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ChatViewEventJoinRoom value)? joinRoom,
-    TResult? Function(ChatViewEventLeaveRoom value)? leaveRoom,
+    TResult? Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult? Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult? Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult? Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult? Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult? Function(ChatViewEventSendMessage value)? sendMessage,
     TResult? Function(ChatViewEventError value)? error,
   }) {
-    return joinRoom?.call(this);
+    return joinRoomConfirm?.call(this);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(ChatViewEventJoinRoom value)? joinRoom,
-    TResult Function(ChatViewEventLeaveRoom value)? leaveRoom,
+    TResult Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult Function(ChatViewEventSendMessage value)? sendMessage,
     TResult Function(ChatViewEventError value)? error,
     required TResult orElse(),
   }) {
-    if (joinRoom != null) {
-      return joinRoom(this);
+    if (joinRoomConfirm != null) {
+      return joinRoomConfirm(this);
     }
     return orElse();
   }
 }
 
-abstract class ChatViewEventJoinRoom implements ChatViewEvent {
-  const factory ChatViewEventJoinRoom() = _$ChatViewEventJoinRoomImpl;
+abstract class ChatViewEventJoinRoomConfirm implements ChatViewEvent {
+  const factory ChatViewEventJoinRoomConfirm() =
+      _$ChatViewEventJoinRoomConfirmImpl;
 }
 
 /// @nodoc
-abstract class _$$ChatViewEventLeaveRoomImplCopyWith<$Res> {
-  factory _$$ChatViewEventLeaveRoomImplCopyWith(
-          _$ChatViewEventLeaveRoomImpl value,
-          $Res Function(_$ChatViewEventLeaveRoomImpl) then) =
-      __$$ChatViewEventLeaveRoomImplCopyWithImpl<$Res>;
+abstract class _$$ChatViewEventOpponentJoinRoomImplCopyWith<$Res> {
+  factory _$$ChatViewEventOpponentJoinRoomImplCopyWith(
+          _$ChatViewEventOpponentJoinRoomImpl value,
+          $Res Function(_$ChatViewEventOpponentJoinRoomImpl) then) =
+      __$$ChatViewEventOpponentJoinRoomImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$ChatViewEventLeaveRoomImplCopyWithImpl<$Res>
-    extends _$ChatViewEventCopyWithImpl<$Res, _$ChatViewEventLeaveRoomImpl>
-    implements _$$ChatViewEventLeaveRoomImplCopyWith<$Res> {
-  __$$ChatViewEventLeaveRoomImplCopyWithImpl(
-      _$ChatViewEventLeaveRoomImpl _value,
-      $Res Function(_$ChatViewEventLeaveRoomImpl) _then)
+class __$$ChatViewEventOpponentJoinRoomImplCopyWithImpl<$Res>
+    extends _$ChatViewEventCopyWithImpl<$Res,
+        _$ChatViewEventOpponentJoinRoomImpl>
+    implements _$$ChatViewEventOpponentJoinRoomImplCopyWith<$Res> {
+  __$$ChatViewEventOpponentJoinRoomImplCopyWithImpl(
+      _$ChatViewEventOpponentJoinRoomImpl _value,
+      $Res Function(_$ChatViewEventOpponentJoinRoomImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$ChatViewEventLeaveRoomImpl implements ChatViewEventLeaveRoom {
-  const _$ChatViewEventLeaveRoomImpl();
+class _$ChatViewEventOpponentJoinRoomImpl
+    implements ChatViewEventOpponentJoinRoom {
+  const _$ChatViewEventOpponentJoinRoomImpl();
 
   @override
   String toString() {
-    return 'ChatViewEvent.leaveRoom()';
+    return 'ChatViewEvent.opponentJoinRoom()';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ChatViewEventLeaveRoomImpl);
+            other is _$ChatViewEventOpponentJoinRoomImpl);
   }
 
   @override
@@ -231,33 +299,45 @@ class _$ChatViewEventLeaveRoomImpl implements ChatViewEventLeaveRoom {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() joinRoom,
-    required TResult Function() leaveRoom,
+    required TResult Function() joinRoomConfirm,
+    required TResult Function() opponentJoinRoom,
+    required TResult Function() leaveRoomConfirm,
+    required TResult Function() opponentLeaveRoom,
+    required TResult Function() opponentSendMessage,
+    required TResult Function() sendMessage,
     required TResult Function(Exception e) error,
   }) {
-    return leaveRoom();
+    return opponentJoinRoom();
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? joinRoom,
-    TResult? Function()? leaveRoom,
+    TResult? Function()? joinRoomConfirm,
+    TResult? Function()? opponentJoinRoom,
+    TResult? Function()? leaveRoomConfirm,
+    TResult? Function()? opponentLeaveRoom,
+    TResult? Function()? opponentSendMessage,
+    TResult? Function()? sendMessage,
     TResult? Function(Exception e)? error,
   }) {
-    return leaveRoom?.call();
+    return opponentJoinRoom?.call();
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? joinRoom,
-    TResult Function()? leaveRoom,
+    TResult Function()? joinRoomConfirm,
+    TResult Function()? opponentJoinRoom,
+    TResult Function()? leaveRoomConfirm,
+    TResult Function()? opponentLeaveRoom,
+    TResult Function()? opponentSendMessage,
+    TResult Function()? sendMessage,
     TResult Function(Exception e)? error,
     required TResult orElse(),
   }) {
-    if (leaveRoom != null) {
-      return leaveRoom();
+    if (opponentJoinRoom != null) {
+      return opponentJoinRoom();
     }
     return orElse();
   }
@@ -265,40 +345,637 @@ class _$ChatViewEventLeaveRoomImpl implements ChatViewEventLeaveRoom {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(ChatViewEventJoinRoom value) joinRoom,
-    required TResult Function(ChatViewEventLeaveRoom value) leaveRoom,
+    required TResult Function(ChatViewEventJoinRoomConfirm value)
+        joinRoomConfirm,
+    required TResult Function(ChatViewEventOpponentJoinRoom value)
+        opponentJoinRoom,
+    required TResult Function(ChatViewEventLeaveRoomConfirm value)
+        leaveRoomConfirm,
+    required TResult Function(ChatViewEventOpponetLeaveRoom value)
+        opponentLeaveRoom,
+    required TResult Function(ChatViewEventOpponentSendMessage value)
+        opponentSendMessage,
+    required TResult Function(ChatViewEventSendMessage value) sendMessage,
     required TResult Function(ChatViewEventError value) error,
   }) {
-    return leaveRoom(this);
+    return opponentJoinRoom(this);
   }
 
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ChatViewEventJoinRoom value)? joinRoom,
-    TResult? Function(ChatViewEventLeaveRoom value)? leaveRoom,
+    TResult? Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult? Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult? Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult? Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult? Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult? Function(ChatViewEventSendMessage value)? sendMessage,
     TResult? Function(ChatViewEventError value)? error,
   }) {
-    return leaveRoom?.call(this);
+    return opponentJoinRoom?.call(this);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(ChatViewEventJoinRoom value)? joinRoom,
-    TResult Function(ChatViewEventLeaveRoom value)? leaveRoom,
+    TResult Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult Function(ChatViewEventSendMessage value)? sendMessage,
     TResult Function(ChatViewEventError value)? error,
     required TResult orElse(),
   }) {
-    if (leaveRoom != null) {
-      return leaveRoom(this);
+    if (opponentJoinRoom != null) {
+      return opponentJoinRoom(this);
     }
     return orElse();
   }
 }
 
-abstract class ChatViewEventLeaveRoom implements ChatViewEvent {
-  const factory ChatViewEventLeaveRoom() = _$ChatViewEventLeaveRoomImpl;
+abstract class ChatViewEventOpponentJoinRoom implements ChatViewEvent {
+  const factory ChatViewEventOpponentJoinRoom() =
+      _$ChatViewEventOpponentJoinRoomImpl;
+}
+
+/// @nodoc
+abstract class _$$ChatViewEventLeaveRoomConfirmImplCopyWith<$Res> {
+  factory _$$ChatViewEventLeaveRoomConfirmImplCopyWith(
+          _$ChatViewEventLeaveRoomConfirmImpl value,
+          $Res Function(_$ChatViewEventLeaveRoomConfirmImpl) then) =
+      __$$ChatViewEventLeaveRoomConfirmImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$ChatViewEventLeaveRoomConfirmImplCopyWithImpl<$Res>
+    extends _$ChatViewEventCopyWithImpl<$Res,
+        _$ChatViewEventLeaveRoomConfirmImpl>
+    implements _$$ChatViewEventLeaveRoomConfirmImplCopyWith<$Res> {
+  __$$ChatViewEventLeaveRoomConfirmImplCopyWithImpl(
+      _$ChatViewEventLeaveRoomConfirmImpl _value,
+      $Res Function(_$ChatViewEventLeaveRoomConfirmImpl) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$ChatViewEventLeaveRoomConfirmImpl
+    implements ChatViewEventLeaveRoomConfirm {
+  const _$ChatViewEventLeaveRoomConfirmImpl();
+
+  @override
+  String toString() {
+    return 'ChatViewEvent.leaveRoomConfirm()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ChatViewEventLeaveRoomConfirmImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() joinRoomConfirm,
+    required TResult Function() opponentJoinRoom,
+    required TResult Function() leaveRoomConfirm,
+    required TResult Function() opponentLeaveRoom,
+    required TResult Function() opponentSendMessage,
+    required TResult Function() sendMessage,
+    required TResult Function(Exception e) error,
+  }) {
+    return leaveRoomConfirm();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? joinRoomConfirm,
+    TResult? Function()? opponentJoinRoom,
+    TResult? Function()? leaveRoomConfirm,
+    TResult? Function()? opponentLeaveRoom,
+    TResult? Function()? opponentSendMessage,
+    TResult? Function()? sendMessage,
+    TResult? Function(Exception e)? error,
+  }) {
+    return leaveRoomConfirm?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? joinRoomConfirm,
+    TResult Function()? opponentJoinRoom,
+    TResult Function()? leaveRoomConfirm,
+    TResult Function()? opponentLeaveRoom,
+    TResult Function()? opponentSendMessage,
+    TResult Function()? sendMessage,
+    TResult Function(Exception e)? error,
+    required TResult orElse(),
+  }) {
+    if (leaveRoomConfirm != null) {
+      return leaveRoomConfirm();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(ChatViewEventJoinRoomConfirm value)
+        joinRoomConfirm,
+    required TResult Function(ChatViewEventOpponentJoinRoom value)
+        opponentJoinRoom,
+    required TResult Function(ChatViewEventLeaveRoomConfirm value)
+        leaveRoomConfirm,
+    required TResult Function(ChatViewEventOpponetLeaveRoom value)
+        opponentLeaveRoom,
+    required TResult Function(ChatViewEventOpponentSendMessage value)
+        opponentSendMessage,
+    required TResult Function(ChatViewEventSendMessage value) sendMessage,
+    required TResult Function(ChatViewEventError value) error,
+  }) {
+    return leaveRoomConfirm(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult? Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult? Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult? Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult? Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult? Function(ChatViewEventSendMessage value)? sendMessage,
+    TResult? Function(ChatViewEventError value)? error,
+  }) {
+    return leaveRoomConfirm?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult Function(ChatViewEventSendMessage value)? sendMessage,
+    TResult Function(ChatViewEventError value)? error,
+    required TResult orElse(),
+  }) {
+    if (leaveRoomConfirm != null) {
+      return leaveRoomConfirm(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class ChatViewEventLeaveRoomConfirm implements ChatViewEvent {
+  const factory ChatViewEventLeaveRoomConfirm() =
+      _$ChatViewEventLeaveRoomConfirmImpl;
+}
+
+/// @nodoc
+abstract class _$$ChatViewEventOpponetLeaveRoomImplCopyWith<$Res> {
+  factory _$$ChatViewEventOpponetLeaveRoomImplCopyWith(
+          _$ChatViewEventOpponetLeaveRoomImpl value,
+          $Res Function(_$ChatViewEventOpponetLeaveRoomImpl) then) =
+      __$$ChatViewEventOpponetLeaveRoomImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$ChatViewEventOpponetLeaveRoomImplCopyWithImpl<$Res>
+    extends _$ChatViewEventCopyWithImpl<$Res,
+        _$ChatViewEventOpponetLeaveRoomImpl>
+    implements _$$ChatViewEventOpponetLeaveRoomImplCopyWith<$Res> {
+  __$$ChatViewEventOpponetLeaveRoomImplCopyWithImpl(
+      _$ChatViewEventOpponetLeaveRoomImpl _value,
+      $Res Function(_$ChatViewEventOpponetLeaveRoomImpl) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$ChatViewEventOpponetLeaveRoomImpl
+    implements ChatViewEventOpponetLeaveRoom {
+  const _$ChatViewEventOpponetLeaveRoomImpl();
+
+  @override
+  String toString() {
+    return 'ChatViewEvent.opponentLeaveRoom()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ChatViewEventOpponetLeaveRoomImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() joinRoomConfirm,
+    required TResult Function() opponentJoinRoom,
+    required TResult Function() leaveRoomConfirm,
+    required TResult Function() opponentLeaveRoom,
+    required TResult Function() opponentSendMessage,
+    required TResult Function() sendMessage,
+    required TResult Function(Exception e) error,
+  }) {
+    return opponentLeaveRoom();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? joinRoomConfirm,
+    TResult? Function()? opponentJoinRoom,
+    TResult? Function()? leaveRoomConfirm,
+    TResult? Function()? opponentLeaveRoom,
+    TResult? Function()? opponentSendMessage,
+    TResult? Function()? sendMessage,
+    TResult? Function(Exception e)? error,
+  }) {
+    return opponentLeaveRoom?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? joinRoomConfirm,
+    TResult Function()? opponentJoinRoom,
+    TResult Function()? leaveRoomConfirm,
+    TResult Function()? opponentLeaveRoom,
+    TResult Function()? opponentSendMessage,
+    TResult Function()? sendMessage,
+    TResult Function(Exception e)? error,
+    required TResult orElse(),
+  }) {
+    if (opponentLeaveRoom != null) {
+      return opponentLeaveRoom();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(ChatViewEventJoinRoomConfirm value)
+        joinRoomConfirm,
+    required TResult Function(ChatViewEventOpponentJoinRoom value)
+        opponentJoinRoom,
+    required TResult Function(ChatViewEventLeaveRoomConfirm value)
+        leaveRoomConfirm,
+    required TResult Function(ChatViewEventOpponetLeaveRoom value)
+        opponentLeaveRoom,
+    required TResult Function(ChatViewEventOpponentSendMessage value)
+        opponentSendMessage,
+    required TResult Function(ChatViewEventSendMessage value) sendMessage,
+    required TResult Function(ChatViewEventError value) error,
+  }) {
+    return opponentLeaveRoom(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult? Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult? Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult? Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult? Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult? Function(ChatViewEventSendMessage value)? sendMessage,
+    TResult? Function(ChatViewEventError value)? error,
+  }) {
+    return opponentLeaveRoom?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult Function(ChatViewEventSendMessage value)? sendMessage,
+    TResult Function(ChatViewEventError value)? error,
+    required TResult orElse(),
+  }) {
+    if (opponentLeaveRoom != null) {
+      return opponentLeaveRoom(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class ChatViewEventOpponetLeaveRoom implements ChatViewEvent {
+  const factory ChatViewEventOpponetLeaveRoom() =
+      _$ChatViewEventOpponetLeaveRoomImpl;
+}
+
+/// @nodoc
+abstract class _$$ChatViewEventOpponentSendMessageImplCopyWith<$Res> {
+  factory _$$ChatViewEventOpponentSendMessageImplCopyWith(
+          _$ChatViewEventOpponentSendMessageImpl value,
+          $Res Function(_$ChatViewEventOpponentSendMessageImpl) then) =
+      __$$ChatViewEventOpponentSendMessageImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$ChatViewEventOpponentSendMessageImplCopyWithImpl<$Res>
+    extends _$ChatViewEventCopyWithImpl<$Res,
+        _$ChatViewEventOpponentSendMessageImpl>
+    implements _$$ChatViewEventOpponentSendMessageImplCopyWith<$Res> {
+  __$$ChatViewEventOpponentSendMessageImplCopyWithImpl(
+      _$ChatViewEventOpponentSendMessageImpl _value,
+      $Res Function(_$ChatViewEventOpponentSendMessageImpl) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$ChatViewEventOpponentSendMessageImpl
+    implements ChatViewEventOpponentSendMessage {
+  const _$ChatViewEventOpponentSendMessageImpl();
+
+  @override
+  String toString() {
+    return 'ChatViewEvent.opponentSendMessage()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ChatViewEventOpponentSendMessageImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() joinRoomConfirm,
+    required TResult Function() opponentJoinRoom,
+    required TResult Function() leaveRoomConfirm,
+    required TResult Function() opponentLeaveRoom,
+    required TResult Function() opponentSendMessage,
+    required TResult Function() sendMessage,
+    required TResult Function(Exception e) error,
+  }) {
+    return opponentSendMessage();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? joinRoomConfirm,
+    TResult? Function()? opponentJoinRoom,
+    TResult? Function()? leaveRoomConfirm,
+    TResult? Function()? opponentLeaveRoom,
+    TResult? Function()? opponentSendMessage,
+    TResult? Function()? sendMessage,
+    TResult? Function(Exception e)? error,
+  }) {
+    return opponentSendMessage?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? joinRoomConfirm,
+    TResult Function()? opponentJoinRoom,
+    TResult Function()? leaveRoomConfirm,
+    TResult Function()? opponentLeaveRoom,
+    TResult Function()? opponentSendMessage,
+    TResult Function()? sendMessage,
+    TResult Function(Exception e)? error,
+    required TResult orElse(),
+  }) {
+    if (opponentSendMessage != null) {
+      return opponentSendMessage();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(ChatViewEventJoinRoomConfirm value)
+        joinRoomConfirm,
+    required TResult Function(ChatViewEventOpponentJoinRoom value)
+        opponentJoinRoom,
+    required TResult Function(ChatViewEventLeaveRoomConfirm value)
+        leaveRoomConfirm,
+    required TResult Function(ChatViewEventOpponetLeaveRoom value)
+        opponentLeaveRoom,
+    required TResult Function(ChatViewEventOpponentSendMessage value)
+        opponentSendMessage,
+    required TResult Function(ChatViewEventSendMessage value) sendMessage,
+    required TResult Function(ChatViewEventError value) error,
+  }) {
+    return opponentSendMessage(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult? Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult? Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult? Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult? Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult? Function(ChatViewEventSendMessage value)? sendMessage,
+    TResult? Function(ChatViewEventError value)? error,
+  }) {
+    return opponentSendMessage?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult Function(ChatViewEventSendMessage value)? sendMessage,
+    TResult Function(ChatViewEventError value)? error,
+    required TResult orElse(),
+  }) {
+    if (opponentSendMessage != null) {
+      return opponentSendMessage(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class ChatViewEventOpponentSendMessage implements ChatViewEvent {
+  const factory ChatViewEventOpponentSendMessage() =
+      _$ChatViewEventOpponentSendMessageImpl;
+}
+
+/// @nodoc
+abstract class _$$ChatViewEventSendMessageImplCopyWith<$Res> {
+  factory _$$ChatViewEventSendMessageImplCopyWith(
+          _$ChatViewEventSendMessageImpl value,
+          $Res Function(_$ChatViewEventSendMessageImpl) then) =
+      __$$ChatViewEventSendMessageImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$ChatViewEventSendMessageImplCopyWithImpl<$Res>
+    extends _$ChatViewEventCopyWithImpl<$Res, _$ChatViewEventSendMessageImpl>
+    implements _$$ChatViewEventSendMessageImplCopyWith<$Res> {
+  __$$ChatViewEventSendMessageImplCopyWithImpl(
+      _$ChatViewEventSendMessageImpl _value,
+      $Res Function(_$ChatViewEventSendMessageImpl) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$ChatViewEventSendMessageImpl implements ChatViewEventSendMessage {
+  const _$ChatViewEventSendMessageImpl();
+
+  @override
+  String toString() {
+    return 'ChatViewEvent.sendMessage()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ChatViewEventSendMessageImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() joinRoomConfirm,
+    required TResult Function() opponentJoinRoom,
+    required TResult Function() leaveRoomConfirm,
+    required TResult Function() opponentLeaveRoom,
+    required TResult Function() opponentSendMessage,
+    required TResult Function() sendMessage,
+    required TResult Function(Exception e) error,
+  }) {
+    return sendMessage();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? joinRoomConfirm,
+    TResult? Function()? opponentJoinRoom,
+    TResult? Function()? leaveRoomConfirm,
+    TResult? Function()? opponentLeaveRoom,
+    TResult? Function()? opponentSendMessage,
+    TResult? Function()? sendMessage,
+    TResult? Function(Exception e)? error,
+  }) {
+    return sendMessage?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? joinRoomConfirm,
+    TResult Function()? opponentJoinRoom,
+    TResult Function()? leaveRoomConfirm,
+    TResult Function()? opponentLeaveRoom,
+    TResult Function()? opponentSendMessage,
+    TResult Function()? sendMessage,
+    TResult Function(Exception e)? error,
+    required TResult orElse(),
+  }) {
+    if (sendMessage != null) {
+      return sendMessage();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(ChatViewEventJoinRoomConfirm value)
+        joinRoomConfirm,
+    required TResult Function(ChatViewEventOpponentJoinRoom value)
+        opponentJoinRoom,
+    required TResult Function(ChatViewEventLeaveRoomConfirm value)
+        leaveRoomConfirm,
+    required TResult Function(ChatViewEventOpponetLeaveRoom value)
+        opponentLeaveRoom,
+    required TResult Function(ChatViewEventOpponentSendMessage value)
+        opponentSendMessage,
+    required TResult Function(ChatViewEventSendMessage value) sendMessage,
+    required TResult Function(ChatViewEventError value) error,
+  }) {
+    return sendMessage(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult? Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult? Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult? Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult? Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult? Function(ChatViewEventSendMessage value)? sendMessage,
+    TResult? Function(ChatViewEventError value)? error,
+  }) {
+    return sendMessage?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult Function(ChatViewEventSendMessage value)? sendMessage,
+    TResult Function(ChatViewEventError value)? error,
+    required TResult orElse(),
+  }) {
+    if (sendMessage != null) {
+      return sendMessage(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class ChatViewEventSendMessage implements ChatViewEvent {
+  const factory ChatViewEventSendMessage() = _$ChatViewEventSendMessageImpl;
 }
 
 /// @nodoc
@@ -366,8 +1043,12 @@ class _$ChatViewEventErrorImpl implements ChatViewEventError {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() joinRoom,
-    required TResult Function() leaveRoom,
+    required TResult Function() joinRoomConfirm,
+    required TResult Function() opponentJoinRoom,
+    required TResult Function() leaveRoomConfirm,
+    required TResult Function() opponentLeaveRoom,
+    required TResult Function() opponentSendMessage,
+    required TResult Function() sendMessage,
     required TResult Function(Exception e) error,
   }) {
     return error(e);
@@ -376,8 +1057,12 @@ class _$ChatViewEventErrorImpl implements ChatViewEventError {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? joinRoom,
-    TResult? Function()? leaveRoom,
+    TResult? Function()? joinRoomConfirm,
+    TResult? Function()? opponentJoinRoom,
+    TResult? Function()? leaveRoomConfirm,
+    TResult? Function()? opponentLeaveRoom,
+    TResult? Function()? opponentSendMessage,
+    TResult? Function()? sendMessage,
     TResult? Function(Exception e)? error,
   }) {
     return error?.call(e);
@@ -386,8 +1071,12 @@ class _$ChatViewEventErrorImpl implements ChatViewEventError {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? joinRoom,
-    TResult Function()? leaveRoom,
+    TResult Function()? joinRoomConfirm,
+    TResult Function()? opponentJoinRoom,
+    TResult Function()? leaveRoomConfirm,
+    TResult Function()? opponentLeaveRoom,
+    TResult Function()? opponentSendMessage,
+    TResult Function()? sendMessage,
     TResult Function(Exception e)? error,
     required TResult orElse(),
   }) {
@@ -400,8 +1089,17 @@ class _$ChatViewEventErrorImpl implements ChatViewEventError {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(ChatViewEventJoinRoom value) joinRoom,
-    required TResult Function(ChatViewEventLeaveRoom value) leaveRoom,
+    required TResult Function(ChatViewEventJoinRoomConfirm value)
+        joinRoomConfirm,
+    required TResult Function(ChatViewEventOpponentJoinRoom value)
+        opponentJoinRoom,
+    required TResult Function(ChatViewEventLeaveRoomConfirm value)
+        leaveRoomConfirm,
+    required TResult Function(ChatViewEventOpponetLeaveRoom value)
+        opponentLeaveRoom,
+    required TResult Function(ChatViewEventOpponentSendMessage value)
+        opponentSendMessage,
+    required TResult Function(ChatViewEventSendMessage value) sendMessage,
     required TResult Function(ChatViewEventError value) error,
   }) {
     return error(this);
@@ -410,8 +1108,13 @@ class _$ChatViewEventErrorImpl implements ChatViewEventError {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ChatViewEventJoinRoom value)? joinRoom,
-    TResult? Function(ChatViewEventLeaveRoom value)? leaveRoom,
+    TResult? Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult? Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult? Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult? Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult? Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult? Function(ChatViewEventSendMessage value)? sendMessage,
     TResult? Function(ChatViewEventError value)? error,
   }) {
     return error?.call(this);
@@ -420,8 +1123,13 @@ class _$ChatViewEventErrorImpl implements ChatViewEventError {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(ChatViewEventJoinRoom value)? joinRoom,
-    TResult Function(ChatViewEventLeaveRoom value)? leaveRoom,
+    TResult Function(ChatViewEventJoinRoomConfirm value)? joinRoomConfirm,
+    TResult Function(ChatViewEventOpponentJoinRoom value)? opponentJoinRoom,
+    TResult Function(ChatViewEventLeaveRoomConfirm value)? leaveRoomConfirm,
+    TResult Function(ChatViewEventOpponetLeaveRoom value)? opponentLeaveRoom,
+    TResult Function(ChatViewEventOpponentSendMessage value)?
+        opponentSendMessage,
+    TResult Function(ChatViewEventSendMessage value)? sendMessage,
     TResult Function(ChatViewEventError value)? error,
     required TResult orElse(),
   }) {

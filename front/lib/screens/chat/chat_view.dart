@@ -6,6 +6,8 @@ import 'package:front/di.dart';
 import 'package:front/events/chat_view_event.dart';
 import 'package:front/screens/chat/widgets/chat_input_field.dart';
 import 'package:front/screens/chat/widgets/chat_message_list.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class ChatView extends ConsumerStatefulWidget {
   const ChatView({super.key});
@@ -21,7 +23,29 @@ class _ChatViewState extends ConsumerState<ChatView> {
   void initState() {
     super.initState();
     _streamSubscription =
-        ref.read(chatViewModelNotifier).eventStream.listen((event) {});
+        ref.read(chatViewModelNotifier).eventStream.listen((event) {
+      event.whenOrNull(
+        joinRoomConfirm: () {},
+        opponentJoinRoom: () {
+          showTopSnackBar(
+              Overlay.of(context),
+              const CustomSnackBar.success(
+                  message: "A user has join the room"));
+        },
+        leaveRoomConfirm: () {},
+        opponentLeaveRoom: () {
+          showTopSnackBar(
+              Overlay.of(context),
+              const CustomSnackBar.success(
+                  message: "A user has left the room"));
+        },
+        error: (e) {
+          print(e);
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(e.toString())));
+        },
+      );
+    });
   }
 
   @override
@@ -32,26 +56,35 @@ class _ChatViewState extends ConsumerState<ChatView> {
 
   @override
   Widget build(BuildContext context) {
+    bool inTheRoom =
+        ref.watch(chatViewModelNotifier.select((value) => value.inTheRoom));
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat App'),
+        title: const Text('Random Chat'),
         actions: [
           IconButton(
-              onPressed: () async => ref.read(chatViewModelNotifier).joinRoom,
-              icon: const Icon(Icons.play_arrow))
+              onPressed: inTheRoom
+                  ? ref.read(chatViewModelNotifier).leaveRoom
+                  : ref.read(chatViewModelNotifier).joinRoom,
+              icon: Icon(
+                inTheRoom ? Icons.exit_to_app : Icons.play_arrow,
+              ))
         ],
       ),
-      body: const Column(
+      body: Column(
         children: <Widget>[
-          Expanded(
+          const Expanded(
             child: ChatMessageList(),
           ),
-          Padding(padding: const EdgeInsets.all(10.0), child: ChatInputField()),
-          SizedBox(
-            height: 20,
-          )
+          Visibility(
+            visible: inTheRoom,
+            child: const ChatInputField(),
+          ),
+          const SizedBox(
+            height: 25,
+          ),
         ],
       ),
-    );
+  );
   }
 }
