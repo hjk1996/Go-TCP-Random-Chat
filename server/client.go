@@ -26,6 +26,7 @@ func NewClient(conn net.Conn, comChan chan<- Command) *Client {
 	}
 }
 
+
 func (c *Client) ReadInput() {
 	for {
 		msg, err := bufio.NewReader(c.Conn).ReadString('\n')

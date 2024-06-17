@@ -47,7 +47,6 @@ func (ch *ClientHandler) handleJoinRoom(cmd Command) {
 	}
 
 	val, err := ch.Server.RedisClient.LPop(ch.Server.ctx, "open_rooms").Result()
-
 	// 방이 없으면 새로운 방을 만드는 goroutine을 생성
 	if err == redis.Nil {
 		log.Println("No room exists. create new one")

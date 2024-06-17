@@ -7,6 +7,7 @@ import (
 	"net"
 	"sync"
 
+	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -23,25 +24,29 @@ type Server struct {
 }
 
 type ServerConfig struct {
-	Address     string
-	Port        int
-	HostID      string
-	RedisClient *redis.Client
+	Port      int
+	RedisAddr string
 }
 
 func NewServer(conf ServerConfig) *Server {
 	ctx := context.Background()
 
+	redisClient := redis.NewClient(
+		&redis.Options{
+			Addr: conf.RedisAddr,
+			DB:   0,
+		},
+	)
+
 	server := &Server{
-		Address: conf.Address,
 		Port:    conf.Port,
-		HostId:  conf.HostID,
+		HostId:  uuid.New().String(),
 		Clients: make(map[string]*Client),
 		ClientHandler: &ClientHandler{
 			ComChan: make(chan Command),
 		},
 		RedisMessageHandler: &RedisMessageHandler{},
-		RedisClient:         conf.RedisClient,
+		RedisClient:         redisClient,
 		mutex:               sync.RWMutex{},
 		ctx:                 ctx,
 	}
@@ -58,8 +63,7 @@ func (server *Server) AddClient(client *Client) {
 
 func (s *Server) Run() {
 	fmt.Println("Initializing the chat server...")
-
-	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", s.Address, s.Port))
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", s.Port))
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
@@ -78,7 +82,6 @@ func (s *Server) Run() {
 		client := NewClient(conn, s.ClientHandler.ComChan)
 		s.AddClient(client)
 		go client.ReadInput()
-
 	}
 
 }
