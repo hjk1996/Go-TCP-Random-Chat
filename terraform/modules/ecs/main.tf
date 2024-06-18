@@ -1,4 +1,3 @@
-
 resource "aws_ecs_cluster" "main" {
   name = "${var.app_name}-cluster"
 }
@@ -30,12 +29,21 @@ resource "aws_ecs_task_definition" "app_task_definition" {
           protocol      = "TCP"
         }
       ]
-      environment = [
-        for k, v in var.app_environment_variables : {
-            name = k 
+
+      environment = concat(
+        [
+          for k, v in var.app_environment_variables : {
+            name  = k
             value = v
-        }
-      ]
+          }
+        ],
+        [
+          {
+            name  = "REDIS_ADDRESS"
+            value = var.redis_endpoint
+          }
+        ]
+      )
 
       logConfiguration = {
         logDriver = "awslogs"
@@ -46,27 +54,32 @@ resource "aws_ecs_task_definition" "app_task_definition" {
         }
       }
 
-    #   healthCheck = {
-    #     command     = ["CMD-SHELL", "curl -f http://localhost:8000/health-check || exit 1"]
-    #     interval    = 15
-    #     timeout     = 5
-    #     retries     = 3
-    #     startPeriod = 0
-    #   }
+      #   healthCheck = {
+      #     command     = ["CMD-SHELL", "curl -f http://localhost:8000/health-check || exit 1"]
+      #     interval    = 15
+      #     timeout     = 5
+      #     retries     = 3
+      #     startPeriod = 0
+      #   }
     }
   ])
 }
 
 
-resource "aws_ecs_service" "app_ecs_service" {
-  name            = "${var.app_name}-service"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.app_task_definition.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
-  network_configuration {
-    subnets          = var.app_subnets
-    security_groups  = [var.app_sg_id]
-    assign_public_ip = true
-  }
-}
+# resource "aws_ecs_service" "app_ecs_service" {
+#   name            = "${var.app_name}-service"
+#   cluster         = aws_ecs_cluster.main.id
+#   task_definition = aws_ecs_task_definition.app_task_definition.arn
+#   desired_count   = 1
+#   launch_type     = "FARGATE"
+#   network_configuration {
+#     subnets          = var.app_subnets
+#     security_groups  = [var.app_task_sg_id]
+#     assign_public_ip = true
+#   }
+#   load_balancer {
+#     container_port = var.app_port
+#     container_name = var.app_name
+#     target_group_arn = 
+#   }
+# }

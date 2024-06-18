@@ -22,7 +22,7 @@ variable "app_subnets" {
   type = list(string)
 }
 
-variable "app_sg_id" {
+variable "app_task_sg_id" {
   type = string
 }
 
@@ -32,5 +32,11 @@ variable "app_image" {
 
 
 variable "app_environment_variables" {
-  type = map(string, string)
+  type = map(string)
+}
+
+
+variable "redis_endpoint" {
+  type = string
+
 }

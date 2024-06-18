@@ -18,14 +18,28 @@ resource "aws_iam_role" "app_task_role" {
 }
 
 
+data "aws_caller_identity" "current" {
+
+}
+
 resource "aws_iam_policy" "app_task_role_policy" {
   name = "${var.app_name}-role-policy"
   policy = jsonencode(
     {
       Version = "2012-10-17",
       Statement = [
-          
-
+        {
+          Effect = "Allow",
+          Action = [
+            "ssm:GetParameter",
+            "ssm:GetParameters",
+            "ssm:GetParameterHistory",
+            "ssm:GetParametersByPath"
+          ],
+          Resource = [
+            "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/*",
+          ]
+        }
       ]
 
     },
@@ -64,13 +78,13 @@ resource "aws_iam_role" "app_execution_role" {
 }
 
 // 기본적인 ECS Task Execution Role
-resource "aws_iam_role_policy_attachment" "ecs_execution_role_policy" {
+resource "aws_iam_role_policy_attachment" "execution_role_policy_1" {
   role       = aws_iam_role.app_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
 // 클라우드 워치에 로그 쓸 수 있는 정책
-resource "aws_iam_role_policy_attachment" "cloudwatch_logs_policy" {
+resource "aws_iam_role_policy_attachment" "execution_role_policy_2" {
   role       = aws_iam_role.app_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
 }

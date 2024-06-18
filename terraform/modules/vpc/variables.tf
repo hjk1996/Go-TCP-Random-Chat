@@ -6,3 +6,7 @@ variable "app_name" {
 variable "region" {
   type = string
 }
+
+variable "app_port" {
+  type = number
+}
