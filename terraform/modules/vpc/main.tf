@@ -52,6 +52,10 @@ resource "aws_security_group" "app_redis_sg" {
 
 }
 
+
+
+///lb
+
 resource "aws_security_group" "app_lb_sg" {
   name   = "${var.app_name}-lb-sg"
   vpc_id = module.vpc.vpc_id
@@ -71,18 +75,55 @@ resource "aws_security_group" "app_lb_sg" {
 
 }
 
-///lb
+// lb
 
-resource "aws_lb_target_group" "app_tg" {
-  name     = "${var.app_name}-ecs-tg"
+resource "aws_lb" "app_lb" {
+  name               = "${var.app_name}-lb"
+  internal           = false
+  load_balancer_type = "network"
+  security_groups    = [aws_security_group.app_lb_sg.id]
+  subnets            = module.vpc.public_subnets
+
+}
+
+resource "aws_lb_target_group" "app_lb_tg" {
+  name     = "${var.app_name}-lb-tg"
   port     = var.app_port
   protocol = "TCP"
   vpc_id   = module.vpc.vpc_id
+  // ecs fargate로 container 배포할 땐 awsvpc 모드로 배포되므로 target_type을 ip로 설정해야한다
+  target_type = "ip"
 
+
+
+  stickiness {
+    type            = "source_ip"
+    enabled         = true
+    cookie_duration = 86400
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
 }
 
 
-# resource "aws_lb" "name" {
+resource "aws_lb_listener" "app_lb_listener" {
+  load_balancer_arn = aws_lb.app_lb.arn
+  port              = var.app_port
+  protocol          = "TCP"
+  
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.app_lb_tg.arn
+  }
 
-# }
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  depends_on = [ aws_lb_target_group.app_lb_tg ]
+
+}
+

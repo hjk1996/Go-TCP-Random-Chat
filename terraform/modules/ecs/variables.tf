@@ -40,3 +40,7 @@ variable "redis_endpoint" {
   type = string
 
 }
+
+variable "target_group_arn" {
+  type = string
+}

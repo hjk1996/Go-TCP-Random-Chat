@@ -66,20 +66,20 @@ resource "aws_ecs_task_definition" "app_task_definition" {
 }
 
 
-# resource "aws_ecs_service" "app_ecs_service" {
-#   name            = "${var.app_name}-service"
-#   cluster         = aws_ecs_cluster.main.id
-#   task_definition = aws_ecs_task_definition.app_task_definition.arn
-#   desired_count   = 1
-#   launch_type     = "FARGATE"
-#   network_configuration {
-#     subnets          = var.app_subnets
-#     security_groups  = [var.app_task_sg_id]
-#     assign_public_ip = true
-#   }
-#   load_balancer {
-#     container_port = var.app_port
-#     container_name = var.app_name
-#     target_group_arn = 
-#   }
-# }
+resource "aws_ecs_service" "app_ecs_service" {
+  name            = "${var.app_name}-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.app_task_definition.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = var.app_subnets
+    security_groups  = [var.app_task_sg_id]
+    assign_public_ip = true
+  }
+  load_balancer {
+    container_port   = var.app_port
+    container_name   = var.app_name
+    target_group_arn = var.target_group_arn
+  }
+}

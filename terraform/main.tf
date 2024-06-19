@@ -43,6 +43,7 @@ module "ecs_module" {
   app_subnets               = module.vpc_module.app_private_subnets
   app_image                 = var.app_image
   redis_endpoint            = module.redis_module.redis_endpoint
-  depends_on                = [module.redis_module]
+  target_group_arn = module.vpc_module.target_group_arn
 
+  depends_on = [module.redis_module]
 }
