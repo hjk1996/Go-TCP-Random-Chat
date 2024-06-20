@@ -44,3 +44,8 @@ variable "redis_endpoint" {
 variable "target_group_arn" {
   type = string
 }
+
+
+variable "min_capacity" {
+  type = number
+}

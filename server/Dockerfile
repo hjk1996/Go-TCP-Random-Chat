@@ -6,7 +6,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 # 나머지 소스 파일을 복사하고 빌드합니다.
 COPY . .
-RUN CGO_ENABLED=0 go build -o myapp .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o myapp .
 
 # Run stage
 FROM alpine:latest

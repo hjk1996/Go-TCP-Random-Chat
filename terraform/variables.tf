@@ -39,3 +39,12 @@ variable "redis_num_nodes" {
 variable "redis_node_type" {
   type = string
 }
+
+variable "min_capacity" {
+  type = number
+}
+
+variable "max_capacity" {
+  type = number
+}
+

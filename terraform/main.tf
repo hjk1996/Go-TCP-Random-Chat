@@ -40,10 +40,28 @@ module "ecs_module" {
   app_execution_role_arn    = module.iam_module.app_execution_role_arn
   app_task_role_arn         = module.iam_module.app_task_role_arn
   app_port                  = var.app_port
-  app_subnets               = module.vpc_module.app_private_subnets
+  // 앱의 서브넷을 프라이빗으로 하면 서비스가 정상적으로 실행안되는데, 퍼블릭 서브넷으로 바꾸니까 정상적으로 실행됨
+  app_subnets               = module.vpc_module.app_public_subnets
   app_image                 = var.app_image
   redis_endpoint            = module.redis_module.redis_endpoint
-  target_group_arn = module.vpc_module.target_group_arn
+  target_group_arn          = module.vpc_module.target_group_arn
+  min_capacity              = var.min_capacity
+
 
   depends_on = [module.redis_module]
 }
+
+module "autoscale_module" {
+  source             = "./modules/autoscale"
+  autoscale_role_arn = module.iam_module.ecs_autoscale_role_arn
+  min_capacity       = var.min_capacity
+  max_capacity       = var.max_capacity
+  service_id         = module.ecs_module.ecs_service_id
+  service_name       = module.ecs_module.service_name
+  cluster_name       = module.ecs_module.cluster_name
+  app_name           = var.app_name
+
+  depends_on = [module.ecs_module]
+
+}
+

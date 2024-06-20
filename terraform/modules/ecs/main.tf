@@ -40,7 +40,7 @@ resource "aws_ecs_task_definition" "app_task_definition" {
         [
           {
             name  = "REDIS_ADDRESS"
-            value = var.redis_endpoint
+            value = "${var.redis_endpoint}:6379"
           }
         ]
       )
@@ -54,13 +54,6 @@ resource "aws_ecs_task_definition" "app_task_definition" {
         }
       }
 
-      #   healthCheck = {
-      #     command     = ["CMD-SHELL", "curl -f http://localhost:8000/health-check || exit 1"]
-      #     interval    = 15
-      #     timeout     = 5
-      #     retries     = 3
-      #     startPeriod = 0
-      #   }
     }
   ])
 }
@@ -70,7 +63,7 @@ resource "aws_ecs_service" "app_ecs_service" {
   name            = "${var.app_name}-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.app_task_definition.arn
-  desired_count   = 1
+  desired_count   = var.min_capacity
   launch_type     = "FARGATE"
   network_configuration {
     subnets          = var.app_subnets

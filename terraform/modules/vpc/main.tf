@@ -113,7 +113,7 @@ resource "aws_lb_listener" "app_lb_listener" {
   load_balancer_arn = aws_lb.app_lb.arn
   port              = var.app_port
   protocol          = "TCP"
-  
+
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.app_lb_tg.arn
@@ -123,7 +123,7 @@ resource "aws_lb_listener" "app_lb_listener" {
     create_before_destroy = true
   }
 
-  depends_on = [ aws_lb_target_group.app_lb_tg ]
+  depends_on = [aws_lb_target_group.app_lb_tg]
 
 }
 

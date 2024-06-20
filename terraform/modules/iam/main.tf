@@ -59,7 +59,6 @@ resource "aws_iam_role_policy_attachment" "task_role_attachment_1" {
 /////////////////////////
 
 
-
 resource "aws_iam_role" "app_execution_role" {
   name = "${var.app_name}-execution-role"
 
@@ -87,4 +86,34 @@ resource "aws_iam_role_policy_attachment" "execution_role_policy_1" {
 resource "aws_iam_role_policy_attachment" "execution_role_policy_2" {
   role       = aws_iam_role.app_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
+
+
+
+//////////////// 오토스케일링에 필요한 역할
+
+
+resource "aws_iam_role" "ecs_autoscale" {
+  name = "${var.app_name}-ecs-autoscale-role"
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Sid" : "Autoscaling",
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "application-autoscaling.amazonaws.com"
+          },
+          "Action" : "sts:AssumeRole"
+        }
+      ]
+    }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_autoscale" {
+  role       = aws_iam_role.ecs_autoscale.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
+
 }
