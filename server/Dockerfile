@@ -17,6 +17,6 @@ COPY --from=builder /app/myapp .
 # RUN chmod +x myapp 
 # 디버깅을 위해 ls 명령어를 추가하여 파일 존재 여부를 확인합니다.
 RUN ls -la /app
-CMD ["./myapp"]
+CMD ["/app/myapp"]
 
 
