@@ -40,6 +40,7 @@ func (ch *ClientHandler) handleJoinRoom(cmd Command) {
 	ch.Server.mutex.Lock()
 	defer ch.Server.mutex.Unlock()
 
+	// 클라이언트가 이미 방에 들어가있으면 오류 발생시킴
 	if cmd.Client.CurrentRoomId != "" {
 		content := fmt.Sprintf("Client has already joined the room %s", cmd.Client.CurrentRoomId)
 		ch.writeLogAndSendError(cmd.Client.ID, content)
@@ -47,7 +48,7 @@ func (ch *ClientHandler) handleJoinRoom(cmd Command) {
 	}
 
 	val, err := ch.Server.RedisClient.LPop(ch.Server.ctx, "open_rooms").Result()
-	// 방이 없으면 새로운 방을 만드는 goroutine을 생성
+	// join 명령어를 했늗네 들어갈 수 있는 방이 없으면 새로운 방을 만드는 goroutine을 생성
 	if err == redis.Nil {
 		log.Println("No room exists. create new one")
 		go ch.handleCreateRoom(cmd)

@@ -13,6 +13,8 @@ resource "aws_elasticache_replication_group" "app" {
   num_cache_clusters          = var.num_cache_nodes
   subnet_group_name           = aws_elasticache_subnet_group.main.name
   port                        = 6379
+  // 6379 포트 연 sg 추가 안해줘서 timeout 에러 났었음
+  security_group_ids = [var.redis_securiry_group_id]
 
   lifecycle {
     ignore_changes = [num_cache_clusters]

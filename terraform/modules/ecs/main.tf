@@ -38,6 +38,9 @@ resource "aws_ecs_task_definition" "app_task_definition" {
           }
         ],
         [
+
+          // aws에서 제공해주는 redis endpoint 값에는 포트번호가 안달려있으므로 달아줘야함.
+      
           {
             name  = "REDIS_ADDRESS"
             value = "${var.redis_endpoint}:6379"

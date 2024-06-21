@@ -15,5 +15,3 @@ output "redis_endpoint" {
 output "lb_dns_name" {
   value = module.vpc_module.lb_dns_name
 }
-
-
