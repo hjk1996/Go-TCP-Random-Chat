@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      APP_NAME: go-tcp-chat
+      APP_NAME: go-tcp-random-chat
       AWS_REGION: ap-northeast-2
 
     steps:
