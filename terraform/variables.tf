@@ -29,6 +29,7 @@ variable "app_environment_variables" {
 variable "app_image" {
   type        = string
   description = "docker image path"
+  default = "hjk1996/go-tcp-random-chat:latest"
 }
 
 
