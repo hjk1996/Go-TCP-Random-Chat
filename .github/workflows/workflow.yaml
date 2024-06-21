@@ -41,6 +41,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Get the ecs task definition
+        id: get-task-def
         run: |
           aws ecs describe-task-definition \
            --task-definition ${{ env.APP_NAME }} \
