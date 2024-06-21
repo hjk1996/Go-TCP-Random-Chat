@@ -43,7 +43,7 @@ jobs:
       - name: Get the ecs task definition
         run: |
           aws ecs describe-task-definition \
-           --task-definition {{ env.APP_NAME }} \
+           --task-definition ${{ env.APP_NAME }} \
            --query taskDefinition \
            > task-definition.json
 
