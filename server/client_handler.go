@@ -30,8 +30,8 @@ func (ch *ClientHandler) HandleClientMessage() {
 			go ch.handleSendMessageToOpponent(cmd)
 		case CMD_REMOVE_CLIENT:
 			go ch.handleRemoveClient(cmd)
-		case CMD_GET_CURRENT_ROOM:
-
+		case CMD_QUIT:
+			ch.handleQuit(cmd)
 		}
 	}
 }
@@ -299,6 +299,36 @@ func (ch *ClientHandler) handleRemoveClient(cmd Command) {
 		log.Printf("Failed to delete the room that the client left. :%s\n", err.Error())
 	}
 	delete(ch.Server.Clients, cmd.Client.ID)
+}
+
+func (ch *ClientHandler) handleQuit(cmd Command) {
+
+	ch.Server.mutex.Lock()
+	defer ch.Server.mutex.Unlock()
+
+	if !ch.checkClientHasRoom(cmd) {
+		delete(ch.Server.Clients, cmd.Client.ID)
+		cmd.Client.Conn.Close()
+		log.Printf("Removed client %s", cmd.Client.ID)
+		return
+	}
+
+	roomInfo, err := ch.getRoomInfo(cmd.Client.CurrentRoomId)
+
+	if err == nil {
+		for _, client := range roomInfo.Clients {
+			go ch.broadcastMessage(client.HostID, model.BROADCAST_OPPONENT_LEAVE_ROOM, cmd.Client.ID, []string{client.ID}, fmt.Sprintf("User %s has left the room.\n", cmd.Client.ID))
+		}
+	} else {
+		log.Printf("Failed to get room info %s", roomInfo.ID)
+	}
+
+	err = ch.Server.RedisClient.Del(ch.Server.ctx, fmt.Sprintf("room:%s", cmd.Client.CurrentRoomId)).Err()
+	if err != nil {
+		log.Printf("Failed to delete the room that the client left. :%s\n", err.Error())
+	}
+	delete(ch.Server.Clients, cmd.Client.ID)
+	cmd.Client.Conn.Close()
 }
 
 // 다른 서버에 메시지 전달

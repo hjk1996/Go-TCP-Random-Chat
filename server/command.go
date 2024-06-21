@@ -7,7 +7,7 @@ const (
     CMD_LEAVE_ROOM = 4
     CMD_SEND_MESSAGE = 5
     CMD_REMOVE_CLIENT = 6
-    CMD_GET_CURRENT_ROOM = 7
+    CMD_QUIT = 7
 )
 
 
