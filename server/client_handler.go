@@ -66,6 +66,7 @@ func (ch *ClientHandler) handleJoinRoom(cmd Command) {
 	// 모종의 이유로 들어간 방에 아무도 없을 때.
 	// 그냥 방을 다시 만듬
 	if len(roomInfo.Clients) == 0 {
+		log.Println("No one is in the room. Create a new room")
 		go ch.handleCreateRoom(cmd)
 		return
 	}
@@ -73,6 +74,7 @@ func (ch *ClientHandler) handleJoinRoom(cmd Command) {
 	// 내가 만든 방에 내가 들어갔을 때 방을 다시 만듬
 	for _, client := range roomInfo.Clients {
 		if cmd.Client.ID == client.ID {
+			log.Println("User is trying to join the room that the user created")
 			go ch.handleCreateRoom(cmd)
 			return
 		}
@@ -299,6 +301,7 @@ func (ch *ClientHandler) handleRemoveClient(cmd Command) {
 	delete(ch.Server.Clients, cmd.Client.ID)
 }
 
+// 다른 서버에 메시지 전달
 func (ch *ClientHandler) broadcastMessage(
 	channel string, messageType model.BroadcastMessageType, senderId string, targets []string, content string) {
 
@@ -333,6 +336,7 @@ func (ch *ClientHandler) getRoomInfo(roomId string) (*model.RoomInfo, error) {
 
 }
 
+// 이 서버랑 연결된 클라이언트에게 메시지 보내기
 func (ch *ClientHandler) sendMessageToClient(target string, messageType model.ClientMessageType, senderId string, content string) {
 	msg := &model.ClientMessage{
 		MessageType: messageType,
