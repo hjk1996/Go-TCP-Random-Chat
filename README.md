@@ -86,7 +86,7 @@ It is important to note that this application is not intended for production use
 
 ## Commands
 
-    After you have connected to the server using telnet or your custom client, you can use the following commands:
+After you have connected to the server using telnet or your custom client, you can use the following commands
 
 - **Create a New Room**:
 
