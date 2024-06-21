@@ -2,65 +2,126 @@
 
 ## Overview
 
-Go TCP Random Chat is an application built using Golang that allows users to chat with random individuals through TCP socket communication. This application does not use protocols like HTTP; instead, it relies solely on TCP socket communication to implement the chat functionality. Redis is used for data management, ensuring efficient and reliable performance. One of the key features of this project is the use of Terraform, which enables anyone to easily provision their own random chat server.
+Go TCP Random Chat is an application built using Golang that allows users to chat with random individuals through TCP socket communication. This application does not use protocols like HTTP; instead, it relies solely on TCP socket communication to implement the chat functionality. Redis is used for data management, ensuring efficient and reliable performance.
 
-## Features
+The purpose of this project is to understand socket communication and to experience automating infrastructure provisioning using Terraform.
 
-- **TCP Socket Communication**: The application exclusively uses TCP sockets for chat functionality, ensuring a lightweight and efficient communication protocol.
-- **Random Chat Matching**: Connects users randomly to engage in conversations.
-- **Redis Integration**: Utilizes Redis for data management, ensuring high performance and reliability.
-- **Terraform Provisioning**: Allows users to provision their own random chat server easily using Terraform, making the deployment process straightforward and repeatable.
+It is important to note that this application is not intended for production use.
 
 ## Requirements
 
-- **Golang**: Ensure you have Golang installed on your machine. You can download it from [golang.org](https://golang.org/dl/).
-- **Redis**: You will need a Redis server instance. Installation instructions can be found at [redis.io](https://redis.io/download).
 - **Terraform**: Install Terraform from [terraform.io](https://www.terraform.io/downloads.html).
 
-## Installation
+## Deploy your server using Terraform
+
+0. **Prerequisites**:
+
+   Before you begin, ensure that you have the following:
+
+   - An AWS account with the necessary permissions to create resources.
+   - An AWS access key ID and secret access key.
+   - Terraform installed on your local machine.
 
 1. **Clone the Repository**:
 
-   ```bash
-   git clone https://github.com/yourusername/go-tcp-random-chat.git
-   cd go-tcp-random-chat
-   ```
-
-2. **Install Dependencies**:
+   Clone the repository to your local machine using the following command:
 
    ```bash
-   go mod download
+   git clone
    ```
 
-3. **Configure Redis**:
-   Ensure your Redis server is running and configured properly. Update the Redis connection details in the configuration file if necessary.
+2. **Navigate to the Terraform Directory**:
 
-4. **Run the Application**:
-   ```bash
-   go run main.go
-   ```
-
-## Using Terraform to Provision the Server
-
-1. **Navigate to the Terraform Directory**:
+   Navigate to the `terraform` directory within the cloned repository:
 
    ```bash
    cd terraform
    ```
 
-2. **Initialize Terraform**:
+3. **Set Terraform variables**:
+
+   Set the required Terraform variables in the `variables.tf` file. :
+
+   When provisioning infrastructure using Terraform, you need to set the following variables:
+
+   - **region**: The AWS region where your infrastructure will be provisioned (e.g., `us-west-2`).
+
+   - **aws_access_key**: Your AWS access key ID for authentication.
+
+   - **aws_secret_key**: Your AWS secret access key for authentication.
+
+   - **app_name**: The name of the application, which in this case is "go-tcp-random-chat".
+
+   - **app_port**: The port on which the application will run, default is 8888.
+
+   - **app_image**: The Docker image for the application, default is "hjk1996/go-tcp-random-chat:latest".
+
+   - **redis_node_type**: The instance type for the Redis node, default is "cache.t4g.micro".
+
+   - **redis_num_nodes**: The number of Redis nodes, default is 1.
+
+   - **min_capacity**: The minimum number of application instances to run, default is 1.
+
+   - **max_capacity**: The maximum number of application instances to run, default is 3.
+
+4. **Initialize Terraform**:
+
+   Run the following command to initialize Terraform:
 
    ```bash
    terraform init
    ```
 
-3. **Apply the Terraform Configuration**:
+5. **Provision Infrastructure**:
+
+   Run the following command to provision the infrastructure:
+
    ```bash
-   terraform apply
+   terraform apply -auto-approve
    ```
-   Follow the prompts to provision your own random chat server.
 
-## Usage
+   This command will create the necessary infrastructure components, including the VPC, subnets, security groups, Redis cluster, Network Load Balancer, and ECS cluster.
 
-Once the application is running, users can connect to the chat server using a TCP client. Each user will be randomly paired with another user to start a conversation.
+   You can find your server's endpoint in the Terraform output after the infrastructure has been provisioned.
 
+## Commands
+
+    After you have connected to the server using telnet or your custom client, you can use the following commands:
+
+- **Create a New Room**:
+
+  ```bash
+  /new-room
+  ```
+
+  This command creates a new chat room.
+
+- **Join a Room**:
+
+  ```bash
+  /join
+  ```
+
+  This command allows you to join an existing chat room randomly.
+
+- **Leave the Current Room**:
+
+  ```bash
+  /leave
+  ```
+
+  This command lets you leave the current chat room.
+
+- **Send a Message**:
+
+  ```bash
+  /msg <your message>
+  ```
+
+  Use this command to send a message to the other participant in the room.
+
+- **Quit the Chat**:
+  ```bash
+  /quit
+  ```
+  This command disconnects you from the current chat room and ends the connection with the server.

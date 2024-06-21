@@ -35,17 +35,21 @@ variable "app_image" {
 
 variable "redis_num_nodes" {
   type = number
+  default = 3
 }
 
 variable "redis_node_type" {
   type = string
+  default = "cache.t4g.micro"
 }
 
 variable "min_capacity" {
   type = number
+  default = 1
 }
 
 variable "max_capacity" {
   type = number
+  default = 3
 }
 
