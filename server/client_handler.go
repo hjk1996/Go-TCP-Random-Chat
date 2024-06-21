@@ -84,16 +84,17 @@ func (ch *ClientHandler) handleJoinRoom(cmd Command) {
 		ID:     cmd.Client.ID,
 		HostID: ch.Server.HostId,
 	})
-	c := ch.Server.Clients[cmd.Client.ID]
-	if c == nil {
-		log.Printf("Failed to find the client %s\n", cmd.Client.ID)
-		return
-	}
 
 	if err := ch.setRoomInRedis(newRoomInfo); err != nil {
 		ch.writeLogAndSendError(cmd.Client.ID, err.Error())
 		return
 
+	}
+
+	c := ch.Server.Clients[cmd.Client.ID]
+	if c == nil {
+		log.Printf("Failed to find the client %s\n", cmd.Client.ID)
+		return
 	}
 
 	// 메모리에서 클라이언트 현재 방 ID 업데이트
@@ -251,10 +252,6 @@ func (ch *ClientHandler) handleSendMessageToOpponent(cmd Command) {
 
 	if err != nil {
 		ch.writeLogAndSendError(cmd.Client.ID, fmt.Sprintf("Failed to get the data from the redis. : %s", err.Error()))
-		return
-	}
-
-	if len(roomInfo.Clients) == 1 {
 		return
 	}
 

@@ -15,8 +15,8 @@ type RedisMessageHandler struct {
 }
 
 func (rh *RedisMessageHandler) HandleRedisMessage() {
-
-	sub := rh.Server.RedisClient.Subscribe(rh.Server.ctx, fmt.Sprintf("channel:%s", rh.Server.HostId))
+	channel := fmt.Sprintf("channel:%s", rh.Server.HostId)
+	sub := rh.Server.RedisClient.Subscribe(rh.Server.ctx, channel)
 	defer sub.Close()
 	ch := sub.Channel()
 	for rawMessage := range ch {

@@ -78,7 +78,6 @@ func (s *Server) Run() {
 			log.Printf("Failed to read connection from %s", conn.RemoteAddr().String())
 			continue
 		}
-		log.Printf("New client from %s has join the server", conn.RemoteAddr().String())
 		client := NewClient(conn, s.ClientHandler.ComChan)
 		s.AddClient(client)
 		go client.ReadInput()

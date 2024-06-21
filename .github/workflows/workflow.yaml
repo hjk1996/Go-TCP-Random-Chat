@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       APP_NAME: go-tcp-chat
+      AWS_REGION: ap-northeast-2
 
     steps:
       - name: Checkout repository
@@ -31,3 +32,32 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ env.APP_NAME }}:latest
             ${{ secrets.DOCKER_USERNAME }}/${{ env.APP_NAME }}:${{ github.run_number }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get the ecs task definition
+        run: |
+          aws ecs describe-task-definition \
+           --task-definition {{ env.APP_NAME }} \
+           --query taskDefinition \
+           > task-definition.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.APP_NAME }}
+          image: ${{ secrets.DOCKER_USERNAME }}/${{ env.APP_NAME }}:${{ github.run_number }}
+
+      - name: Deploy new ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          service: ${{ env.APP_NAME }}-service
+          cluster: ${{ env.APP_NAME }}-cluster
+          wait-for-service-stability: true
