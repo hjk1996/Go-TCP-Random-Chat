@@ -7,8 +7,8 @@ import (
 )
 
 type RoomInfo struct {
-	ID      string       `json:"id"`
-	Clients []ClientInfo `json:"clients"`
+	ID      string     `json:"id"`
+	Clients []UserInfo `json:"clients"`
 }
 
 func (r *RoomInfo) Copy() *RoomInfo {

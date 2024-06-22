@@ -15,8 +15,8 @@ type Server struct {
 	Address             string
 	Port                int
 	HostId              string
-	Clients             map[string]*Client
-	ClientHandler       *ClientHandler
+	Users               map[string]*User
+	UserHandler       *UserHandler
 	RedisMessageHandler *RedisMessageHandler
 	RedisClient         *redis.Client
 	mutex               sync.RWMutex
@@ -39,10 +39,10 @@ func NewServer(conf ServerConfig) *Server {
 	)
 
 	server := &Server{
-		Port:    conf.Port,
-		HostId:  uuid.New().String(),
-		Clients: make(map[string]*Client),
-		ClientHandler: &ClientHandler{
+		Port:   conf.Port,
+		HostId: uuid.New().String(),
+		Users:  make(map[string]*User),
+		UserHandler: &UserHandler{
 			ComChan: make(chan Command),
 		},
 		RedisMessageHandler: &RedisMessageHandler{},
@@ -50,15 +50,15 @@ func NewServer(conf ServerConfig) *Server {
 		mutex:               sync.RWMutex{},
 		ctx:                 ctx,
 	}
-	server.ClientHandler.Server = server
+	server.UserHandler.Server = server
 	server.RedisMessageHandler.Server = server
 	return server
 }
 
-func (server *Server) AddClient(client *Client) {
+func (server *Server) AddClient(client *User) {
 	server.mutex.Lock()
 	defer server.mutex.Unlock()
-	server.Clients[client.ID] = client
+	server.Users[client.ID] = client
 }
 
 func (s *Server) Run() {
@@ -69,7 +69,7 @@ func (s *Server) Run() {
 	}
 	defer listener.Close()
 
-	go s.ClientHandler.HandleClientMessage()
+	go s.UserHandler.HandleClientMessage()
 	go s.RedisMessageHandler.HandleRedisMessage()
 
 	for {
@@ -79,7 +79,7 @@ func (s *Server) Run() {
 			continue
 		}
 		log.Printf("New client from %s has join the server", conn.RemoteAddr().String())
-		client := NewClient(conn, s.ClientHandler.ComChan)
+		client := NewUser(conn, s.UserHandler.ComChan)
 		s.AddClient(client)
 		go client.ReadInput()
 	}

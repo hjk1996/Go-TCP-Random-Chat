@@ -10,24 +10,23 @@ import (
 	"github.com/google/uuid"
 )
 
-type Client struct {
+type User struct {
 	ID            string
 	Conn          net.Conn
 	ComChan       chan<- Command
 	CurrentRoomId string
 }
 
-func NewClient(conn net.Conn, comChan chan<- Command) *Client {
+func NewUser(conn net.Conn, comChan chan<- Command) *User {
 	clientId := uuid.New().String()
-	return &Client{
+	return &User{
 		ID:      clientId,
 		Conn:    conn,
 		ComChan: comChan,
 	}
 }
 
-
-func (c *Client) ReadInput() {
+func (c *User) ReadInput() {
 	for {
 		msg, err := bufio.NewReader(c.Conn).ReadString('\n')
 		if err != nil {
@@ -64,7 +63,7 @@ func (c *Client) ReadInput() {
 				CommandType: CMD_NEW_ROOM,
 			}
 		case "/msg":
-			if len(chunks) < 2{
+			if len(chunks) < 2 {
 				log.Printf("wrong message command.\n")
 				continue
 			}

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"example.com/chat/data"
+	model "example.com/chat/data"
 )
 
 type RedisMessageHandler struct {
@@ -36,7 +36,7 @@ func (rh *RedisMessageHandler) HandleRedisMessage() {
 
 func (rh *RedisMessageHandler) handleOpponentJoinRoom(msg model.BroadcastMessage) {
 	for _, targetID := range msg.Targets {
-		rh.writeMessage(targetID, msg, model.CLIENT_OPPONENT_JOIN_ROOM)
+		rh.writeMessage(targetID, msg, model.OPPONENT_JOIN_ROOM)
 
 	}
 
@@ -48,33 +48,33 @@ func (rh *RedisMessageHandler) handleLeaveRoom(msg model.BroadcastMessage) {
 	defer rh.Server.mutex.Unlock()
 
 	for _, targetID := range msg.Targets {
-		target := rh.Server.Clients[targetID]
+		target := rh.Server.Users[targetID]
 		if target == nil {
 			continue
 		}
 		target.CurrentRoomId = ""
-		rh.writeMessage(targetID, msg, model.CLIENT_OPPONENT_LEAVE_ROOM)
+		rh.writeMessage(targetID, msg, model.OPPONENT_LEAVE_ROOM)
 
 	}
 }
 
 func (rh *RedisMessageHandler) handleSendMessage(msg model.BroadcastMessage) {
 	for _, targetID := range msg.Targets {
-		rh.writeMessage(targetID, msg, model.CLIENT_OPPONENT_SEND_MESSAGE)
+		rh.writeMessage(targetID, msg, model.OPPONENT_SEND_MESSAGE)
 	}
 }
 
 // TODO: 0613
 // 클라이언트에게 메시지 보내주는거 구현해야함
-func (rh *RedisMessageHandler) writeMessage(clientId string, msg model.BroadcastMessage, messageType model.ClientMessageType) {
-	target := rh.Server.Clients[clientId]
+func (rh *RedisMessageHandler) writeMessage(clientId string, msg model.BroadcastMessage, messageType model.UserMessageType) {
+	target := rh.Server.Users[clientId]
 	if target == nil {
 		log.Printf("User %s  does not exist on server", clientId)
 		return
 	}
 
 	content := strings.TrimSpace(msg.Content)
-	newMsg := &model.ClientMessage{
+	newMsg := &model.UserMessage{
 		MessageType: messageType,
 		SenderID:    msg.SenderId,
 		Content:     content,

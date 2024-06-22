@@ -11,7 +11,7 @@ const (
 )
 
 type Command struct {
-	Client        *Client
+	Client        *User
 	CommandType   int
 	Args          []string
 	CurrentRoomId string

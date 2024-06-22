@@ -1,6 +1,6 @@
 package model
 
-type ClientInfo struct {
+type UserInfo struct {
 	ID     string `json:"id"`
 	HostID string `json:"host_id"`
 }

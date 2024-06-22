@@ -7,17 +7,17 @@ import (
 	"strings"
 	"time"
 
-	"example.com/chat/data"
+	model "example.com/chat/data"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
 
-type ClientHandler struct {
+type UserHandler struct {
 	Server  *Server
 	ComChan chan Command
 }
 
-func (ch *ClientHandler) HandleClientMessage() {
+func (ch *UserHandler) HandleClientMessage() {
 	for cmd := range ch.ComChan {
 		switch cmd.CommandType {
 		case CMD_JOIN_ROOM:
@@ -36,7 +36,7 @@ func (ch *ClientHandler) HandleClientMessage() {
 	}
 }
 
-func (ch *ClientHandler) handleJoinRoom(cmd Command) {
+func (ch *UserHandler) handleJoinRoom(cmd Command) {
 	ch.Server.mutex.Lock()
 	defer ch.Server.mutex.Unlock()
 
@@ -82,7 +82,7 @@ func (ch *ClientHandler) handleJoinRoom(cmd Command) {
 
 	// 새로운 방정보 만들기고 레디스에 업데이트
 	newRoomInfo := roomInfo.Copy()
-	newRoomInfo.Clients = append(newRoomInfo.Clients, model.ClientInfo{
+	newRoomInfo.Clients = append(newRoomInfo.Clients, model.UserInfo{
 		ID:     cmd.Client.ID,
 		HostID: ch.Server.HostId,
 	})
@@ -93,7 +93,7 @@ func (ch *ClientHandler) handleJoinRoom(cmd Command) {
 
 	}
 
-	c := ch.Server.Clients[cmd.Client.ID]
+	c := ch.Server.Users[cmd.Client.ID]
 	if c == nil {
 		log.Printf("Failed to find the client %s\n", cmd.Client.ID)
 		return
@@ -104,7 +104,7 @@ func (ch *ClientHandler) handleJoinRoom(cmd Command) {
 
 	ch.sendMessageToClient(
 		cmd.Client.ID,
-		model.CLIENT_JOIN_ROOM_CONFIRM,
+		model.USER_JOIN_ROOM_CONFIRM,
 		cmd.Client.ID,
 		"",
 	)
@@ -123,7 +123,7 @@ func (ch *ClientHandler) handleJoinRoom(cmd Command) {
 
 }
 
-func (ch *ClientHandler) handleLeaveRoom(cmd Command) {
+func (ch *UserHandler) handleLeaveRoom(cmd Command) {
 	ch.Server.mutex.Lock()
 	defer ch.Server.mutex.Unlock()
 
@@ -148,7 +148,7 @@ func (ch *ClientHandler) handleLeaveRoom(cmd Command) {
 	if len(roomInfo.Clients) < 2 {
 		ch.sendMessageToClient(
 			cmd.Client.ID,
-			model.CLIENT_LEAVE_ROOM_CONFIRM,
+			model.USER_LEAVE_ROOM_CONFIRM,
 			cmd.Client.ID,
 			"",
 		)
@@ -163,7 +163,7 @@ func (ch *ClientHandler) handleLeaveRoom(cmd Command) {
 	// 클라이언트에게 방을 나갔다고 메시지 보냄
 	ch.sendMessageToClient(
 		cmd.Client.ID,
-		model.CLIENT_LEAVE_ROOM_CONFIRM,
+		model.USER_LEAVE_ROOM_CONFIRM,
 		cmd.Client.ID,
 		"",
 	)
@@ -189,7 +189,7 @@ func (ch *ClientHandler) handleLeaveRoom(cmd Command) {
 
 }
 
-func (ch *ClientHandler) handleCreateRoom(cmd Command) {
+func (ch *UserHandler) handleCreateRoom(cmd Command) {
 	ch.Server.mutex.Lock()
 	defer ch.Server.mutex.Unlock()
 
@@ -206,8 +206,8 @@ func (ch *ClientHandler) handleCreateRoom(cmd Command) {
 		return
 	}
 
-	clients := make([]model.ClientInfo, 0, 1)
-	clientInfo := model.ClientInfo{
+	clients := make([]model.UserInfo, 0, 1)
+	clientInfo := model.UserInfo{
 		ID:     cmd.Client.ID,
 		HostID: ch.Server.HostId,
 	}
@@ -235,7 +235,7 @@ func (ch *ClientHandler) handleCreateRoom(cmd Command) {
 
 	ch.sendMessageToClient(
 		cmd.Client.ID,
-		model.CLIENT_CREATE_ROOM_CONFIRM,
+		model.USER_CREATE_ROOM_CONFIRM,
 		cmd.Client.ID,
 		"",
 	)
@@ -243,7 +243,7 @@ func (ch *ClientHandler) handleCreateRoom(cmd Command) {
 
 }
 
-func (ch *ClientHandler) handleSendMessageToOpponent(cmd Command) {
+func (ch *UserHandler) handleSendMessageToOpponent(cmd Command) {
 
 	if !ch.checkClientHasRoom(cmd) {
 		ch.writeLogAndSendError(cmd.Client.ID, fmt.Sprintf("User %s does not belong to any room.", cmd.Client.ID))
@@ -274,12 +274,12 @@ func (ch *ClientHandler) handleSendMessageToOpponent(cmd Command) {
 
 }
 
-func (ch *ClientHandler) handleRemoveClient(cmd Command) {
+func (ch *UserHandler) handleRemoveClient(cmd Command) {
 	ch.Server.mutex.Lock()
 	defer ch.Server.mutex.Unlock()
 
 	if !ch.checkClientHasRoom(cmd) {
-		delete(ch.Server.Clients, cmd.Client.ID)
+		delete(ch.Server.Users, cmd.Client.ID)
 		log.Printf("Removed client %s", cmd.Client.ID)
 		return
 	}
@@ -298,16 +298,16 @@ func (ch *ClientHandler) handleRemoveClient(cmd Command) {
 	if err != nil {
 		log.Printf("Failed to delete the room that the client left. :%s\n", err.Error())
 	}
-	delete(ch.Server.Clients, cmd.Client.ID)
+	delete(ch.Server.Users, cmd.Client.ID)
 }
 
-func (ch *ClientHandler) handleQuit(cmd Command) {
+func (ch *UserHandler) handleQuit(cmd Command) {
 
 	ch.Server.mutex.Lock()
 	defer ch.Server.mutex.Unlock()
 
 	if !ch.checkClientHasRoom(cmd) {
-		delete(ch.Server.Clients, cmd.Client.ID)
+		delete(ch.Server.Users, cmd.Client.ID)
 		cmd.Client.Conn.Close()
 		log.Printf("Removed client %s", cmd.Client.ID)
 		return
@@ -327,12 +327,12 @@ func (ch *ClientHandler) handleQuit(cmd Command) {
 	if err != nil {
 		log.Printf("Failed to delete the room that the client left. :%s\n", err.Error())
 	}
-	delete(ch.Server.Clients, cmd.Client.ID)
+	delete(ch.Server.Users, cmd.Client.ID)
 	cmd.Client.Conn.Close()
 }
 
 // 다른 서버에 메시지 전달
-func (ch *ClientHandler) broadcastMessage(
+func (ch *UserHandler) broadcastMessage(
 	channel string, messageType model.BroadcastMessageType, senderId string, targets []string, content string) {
 
 	message := &model.BroadcastMessage{
@@ -351,7 +351,7 @@ func (ch *ClientHandler) broadcastMessage(
 
 }
 
-func (ch *ClientHandler) getRoomInfo(roomId string) (*model.RoomInfo, error) {
+func (ch *UserHandler) getRoomInfo(roomId string) (*model.RoomInfo, error) {
 	var roomInfo model.RoomInfo
 	infoString, err := ch.Server.RedisClient.Get(ch.Server.ctx, fmt.Sprintf("room:%s", roomId)).Result()
 	if err != nil {
@@ -367,14 +367,14 @@ func (ch *ClientHandler) getRoomInfo(roomId string) (*model.RoomInfo, error) {
 }
 
 // 이 서버랑 연결된 클라이언트에게 메시지 보내기
-func (ch *ClientHandler) sendMessageToClient(target string, messageType model.ClientMessageType, senderId string, content string) {
-	msg := &model.ClientMessage{
+func (ch *UserHandler) sendMessageToClient(target string, messageType model.UserMessageType, senderId string, content string) {
+	msg := &model.UserMessage{
 		MessageType: messageType,
 		SenderID:    senderId,
 		Content:     content,
 		Timestamp:   time.Now(),
 	}
-	client := ch.Server.Clients[target]
+	client := ch.Server.Users[target]
 
 	if client == nil {
 		log.Printf("Failed to find the client %s", target)
@@ -383,7 +383,7 @@ func (ch *ClientHandler) sendMessageToClient(target string, messageType model.Cl
 	}
 }
 
-func (ch *ClientHandler) checkClientHasRoom(cmd Command) bool {
+func (ch *UserHandler) checkClientHasRoom(cmd Command) bool {
 	if cmd.Client.CurrentRoomId == "" {
 		return false
 	} else {
@@ -392,7 +392,7 @@ func (ch *ClientHandler) checkClientHasRoom(cmd Command) bool {
 	}
 }
 
-func (ch *ClientHandler) deleteRoomFromRedis(roomId string) error {
+func (ch *UserHandler) deleteRoomFromRedis(roomId string) error {
 	err := ch.Server.RedisClient.Del(ch.Server.ctx, fmt.Sprintf("room:%s", roomId)).Err()
 	if err != nil {
 		return fmt.Errorf("failed to delete the room: %s", err.Error())
@@ -400,7 +400,7 @@ func (ch *ClientHandler) deleteRoomFromRedis(roomId string) error {
 	return nil
 }
 
-func (ch *ClientHandler) setRoomInRedis(roomInfo *model.RoomInfo) error {
+func (ch *UserHandler) setRoomInRedis(roomInfo *model.RoomInfo) error {
 	err := ch.Server.RedisClient.Set(ch.Server.ctx, fmt.Sprintf("room:%s", roomInfo.ID), roomInfo.ToJson(), time.Minute*30).Err()
 	if err != nil {
 		return err
@@ -408,7 +408,7 @@ func (ch *ClientHandler) setRoomInRedis(roomInfo *model.RoomInfo) error {
 	return nil
 }
 
-func (ch *ClientHandler) findBroadcastTargets(cmd Command, roomInfo *model.RoomInfo) map[string][]string {
+func (ch *UserHandler) findBroadcastTargets(cmd Command, roomInfo *model.RoomInfo) map[string][]string {
 	hostMap := make(map[string][]string)
 	for _, client := range roomInfo.Clients {
 		// 나간 당사자면 메세지 전달 목록에 포함 안함
@@ -421,7 +421,7 @@ func (ch *ClientHandler) findBroadcastTargets(cmd Command, roomInfo *model.RoomI
 
 }
 
-func (ch *ClientHandler) getNewRoomId(cmd Command) (string, error) {
+func (ch *UserHandler) getNewRoomId(cmd Command) (string, error) {
 	var roomId string
 	for {
 		roomId = uuid.New().String()
@@ -439,8 +439,8 @@ func (ch *ClientHandler) getNewRoomId(cmd Command) (string, error) {
 	return roomId, nil
 }
 
-func (ch *ClientHandler) writeLogAndSendError(target string, content string) {
+func (ch *UserHandler) writeLogAndSendError(target string, content string) {
 	log.Printf(content + "\n")
-	ch.sendMessageToClient(target, model.CLIENT_ERROR, target, content)
+	ch.sendMessageToClient(target, model.ERROR, target, content)
 
 }
